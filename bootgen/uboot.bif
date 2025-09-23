@@ -1,0 +1,31 @@
+/* Boot Image Format file */
+/* Description :
+ *	This layout leads to u-boot
+ * Prerequired :
+ *	fsbl.elf, u-boot.elf (compiled with it's own dtb)
+ */
+
+//arch = zynq; split = false; format = BIN
+BOOTIMG:
+{
+	/* common attributes */
+	/* [attribute1] <argument1> */
+	 
+	/* FIRST STAGE BOOTLOADER (FSBL) */
+	[bootloader]fsbl/build/fsbl.elf
+	 
+	/* PROGRAMMABLE LOGIC (PL) BITSTREAM */ 
+	/* [attribute2, attribute3, attribute4=<argument>, attibute=<argument>] <bit> */
+	 
+	/* SECOND STAGE BOOTLOADER (SSBL) */
+	u-boot/u-boot.elf
+ 
+	/* DEVICE TREE BLOB*/
+	/* [offset=<dt-offset>]kernel/buil/zynq-zc706.dtb */
+
+	/* RAMDISK IMAGE */
+	/* [offset=<ramdisk_offset>]uramdisk.image.gz */
+
+	/* KERNEL IMAGE */
+	/* [offset=0x8000]kernel/build/image.ub */
+}

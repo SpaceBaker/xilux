@@ -1,0 +1,36 @@
+/* Boot Image Format file */
+/* Description :
+ *	This layout leads to booting linux.
+ *	U-Boot does the loading of DTB and Linux in memory (instead of FSBL)
+ * Prerequired :
+ *	Compile image(s) with offset
+ */
+
+//arch = zynq; split = false; format = BIN
+BOOTIMG:
+{
+	/* common attributes */
+	/* [attribute1] <argument1> */
+	 
+	/* FIRST STAGE BOOTLOADER (FSBL) */
+	[bootloader]fsbl/build/fsbl.elf
+	 
+	/* PROGRAMMABLE LOGIC (PL) BITSTREAM */ 
+	/* [attribute2, attribute3, attribute4=<argument>, attibute=<argument>] <bit> */
+
+	/* U-BOOT DEVICE TREE BLOB*/
+	/* [load=0x100000]u-boot/build/zynq-zc706.dtb */
+	// u-boot was compiled with device tree
+	 
+	/* SECOND STAGE BOOTLOADER (SSBL) */
+	u-boot/build/u-boot.elf
+ 
+	/* KERNEL DEVICE TREE BLOB */
+	kernel/build/zynq-zc706.dtb
+
+	/* RAMDISK IMAGE */
+	//rootfs/arm_ramdisk.image.gz
+
+	/* KERNEL IMAGE */
+	kernel/build/image.ub
+}
