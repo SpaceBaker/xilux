@@ -1,14 +1,21 @@
 # Preface
+
 This file serve as a diary documenting the progress and process of building this project (namely xilux).
 
+
+
 # Goal
+
 
 
 # Why the name
 The name comes from combining Xilinx and Linux.
 I wanted a short name for the project, and since I am using a Xilinx board, the name sounded cool enough.
 
+
+
 # Procedures
+
 ## Creating the layout of the project
 The layout of a project is an important, but overlooked, step.
 The xilux project attempts to make a concise and logical work environment.
@@ -23,6 +30,7 @@ Currently, the project is structured as followed :
 ├── kernel
 ├── root
 ├── scripts
+├── sources
 └── ssbl
 
 ### bootgen
@@ -56,15 +64,22 @@ Examples are :
  - mkroot.sh : Create a basic/minimal structure for 'root'
  - mkcpio.sh : Wrapper to archive 'initramfs' to cpio format
 
+### sources
+The directory where all the target software sources will be downloaded and built.
+
 ### ssbl
 The Second Stage BootLoader sources and binaries.
 The SSBL is the program that load the kernel in RAM and launch it.
 The most used SSBL are 'GRUB' and 'U-BOOT'
 You can directly 'git clone' u-boot mainline (or your own fork) to this directory (makes it a submodule)
 
+
 ## Adding submodules
+
 ### kernel
+
 We will use the linux kernel for this project. To add it, do the following :
+
 #### Through git
 > git submodule add --depth 1 git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git kernel
 - '--depth 1' means we won't download the whole history. Only the latest branch is fetched and checked out.
@@ -89,5 +104,6 @@ For this project we will be using u-boot for the ssbl. It is lightweight and pop
 Do the same as what was done with the linux kernel.
 
 
-
-
+## Adding sources
+All the applications you want on your target system are layed out in 'sources/manifest'
+Refer to 'doc/manifest.md' on how to add to it.
