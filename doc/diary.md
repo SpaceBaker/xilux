@@ -61,3 +61,31 @@ The Second Stage BootLoader sources and binaries.
 The SSBL is the program that load the kernel in RAM and launch it.
 The most used SSBL are 'GRUB' and 'U-BOOT'
 You can directly 'git clone' u-boot mainline (or your own fork) to this directory (makes it a submodule)
+
+## Adding submodules
+### kernel
+We will use the linux kernel for this project. To add it, do the following :
+#### Through git
+> git submodule add --depth 1 git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git kernel
+- '--depth 1' means we won't download the whole history. Only the latest branch is fetched and checked out.
+> git config -f .gitmodules submodule.kernel.shallow true
+- This command tells submodule update to only do a shallow update (not really necessary if checking out a tag)
+> cd kernel && git fetch origin tag <remote-tag>
+- This command fetch only the specified tag
+> git checkout -b <your-new-branch-name> <remote-tag/branch>
+- Create a new branch from the specified tag
+
+Alternatively (to be tested)
+> git submodule add --single-branch <remote-tag/branch> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+> cd kernel && git checkout -b <your-new-branch-name> <remote-tag/branch>
+
+#### Through tarball
+If you do not wish to use revision control, you can simply download the source code of the desired version and 
+extract it under the 'kernel' folder.
+> wget <linux-kernel-version.tar.gz> && tar -xzf <linux-kernel-version.tar.gz> kernel
+
+### ssbl (u-boot)
+For this project we will be using u-boot for the ssbl. It is lightweight and popular amoung embedded systems.
+Do the same as what was done with the linux kernel
+
+
