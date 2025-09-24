@@ -70,13 +70,13 @@ We will use the linux kernel for this project. To add it, do the following :
 - '--depth 1' means we won't download the whole history. Only the latest branch is fetched and checked out.
 > git config -f .gitmodules submodule.kernel.shallow true
 - This command tells submodule update to only do a shallow update (not really necessary if checking out a tag)
-> cd kernel && git fetch origin tag <remote-tag>
+> cd kernel && git fetch origin tag <remote-tag> --no-tags
 - This command fetch only the specified tag
 > git checkout -b <your-new-branch-name> <remote-tag/branch>
 - Create a new branch from the specified tag
 
 Alternatively (to be tested)
-> git submodule add --single-branch <remote-tag/branch> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+> git submodule add --depth 1 --branch <remote-tag/branch> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 > cd kernel && git checkout -b <your-new-branch-name> <remote-tag/branch>
 
 #### Through tarball
@@ -86,6 +86,8 @@ extract it under the 'kernel' folder.
 
 ### ssbl (u-boot)
 For this project we will be using u-boot for the ssbl. It is lightweight and popular amoung embedded systems.
-Do the same as what was done with the linux kernel
+Do the same as what was done with the linux kernel.
+
+
 
 

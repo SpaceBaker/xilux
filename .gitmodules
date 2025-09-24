@@ -2,3 +2,7 @@
 	path = kernel
 	url = git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 	shallow = true
+[submodule "u-boot"]
+	path = u-boot
+	url = git@github.com:u-boot/u-boot.git
+	shallow = true
