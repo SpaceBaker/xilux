@@ -104,6 +104,22 @@ For this project we will be using u-boot for the ssbl. It is lightweight and pop
 Do the same as what was done with the linux kernel.
 
 
+## Building the kernel
+Prior to building anything, source the 'setup_env.sh' script. This make sure you are compiling for the correct target.
+In the kernel dir, use 'make menuconfig' to enable/disable all the neccessary config points you need.
+This is a complex and tedious task. For my specific case, I used the 'xilinx_zynq_defconfig' found on Xilinx 'linux-xlnx' repo.
+(Careful here, it might be trying to change unkown config points)
+
+To find available defconfigs
+> make help | grep defconfig
+
+To create a .config out of a defconfig
+> make xxx_defconfig
+
+To build the kernel (with the maximum available cores)
+> make -j$(nproc)
+
+
 ## Adding sources
 All the applications you want on your target system are layed out in 'sources/manifest'
 Refer to 'doc/manifest.md' on how to add to it.
