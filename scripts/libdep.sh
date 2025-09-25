@@ -59,10 +59,10 @@ for f in "${FILES[@]}"; do
     # Find lib dep and create dep file
     if [ "$VERBOSE" = true ]; then 
       echo "lib nedded for '${f}' :"
-      echo "$( ${CROSS_COMPILE}ldd --root ${TOPDIR} ${f} | grep '\.so' )" | tee -a "${OUTFILE}"
+      echo "$( "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" | grep '\.so' )" | tee -a "${OUTFILE}"
     else
       #echo "$( ${CROSS_COMPILE}readelf -a ${f} | grep '\.so' )"
-      echo "$( ${CROSS_COMPILE}ldd --root ${TOPDIR} ${f} | grep '\.so' )" >> "${OUTFILE}"
+      echo "$( "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" | grep '\.so' )" >> "${OUTFILE}"
     fi
   fi
 done
