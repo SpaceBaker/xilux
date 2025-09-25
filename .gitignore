@@ -1,3 +1,7 @@
 # BOOTGEN
 bootgen/*.BIN
 bootgen/*.bin
+
+# sources/
+sources/**
+!sources/manifest.json

@@ -43,12 +43,15 @@ SCRIPT_DIR=$(get_script_dir)
 PATH="${PATH:+${PATH}:}${SCRIPT_DIR}:"
 TOP_DIR=$(dirname "${SCRIPT_DIR}")
 ROOT_DIR="${TOP_DIR}/root"
+SRC_DIR="${TOP_DIR}/sources"
 echo "SCRIPT_DIR=${SCRIPT_DIR}"
 echo "TOP_DIR=${TOP_DIR}"
 echo "ROOT_DIR=${ROOT_DIR}"
+echo "SRC_DIR=${SRC_DIR}"
 export SCRIPT_DIR
 export TOP_DIR
 export ROOT_DIR
+export SRC_DIR
 
 # Clean up
 unset get_script_dir
