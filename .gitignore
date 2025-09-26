@@ -4,4 +4,4 @@ bootgen/*.bin
 
 # sources/
 sources/**
-!sources/manifest.json
+!sources/*.json

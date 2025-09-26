@@ -1,6 +1,6 @@
-TODO: this markdown file explains how to use/create a manifest file to add softwares/packages to your target system.
+TODO: this markdown file explains how to use 'pkgm.sh' in conjonction with 'packages.json' to manage softwares/packages for your target system.
 
-Exemple of a source 'manifest.json'
+Exemple of a source 'packages.json'
 
 {
     "packages": [
@@ -12,6 +12,7 @@ Exemple of a source 'manifest.json'
             "download_method": "git",  // or "https", "ftp", etc.
 			"configuring_cmd": [
 				"configure",
+                "--build=${BUILDMACHINE}",
 				"--host=${CHOST}",
 				"--without-selinux",
 				"--disable-libcap",

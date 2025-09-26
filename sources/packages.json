@@ -3,11 +3,10 @@
 		{
 			"name": "bash",
 			"version": "5.3",
-			"download_method": "https",
-			"git_url": "",
 			"download_url": "https://mirrors.ibiblio.org/gnu/bash/",
 			"configuring_cmd": [
 				"configure",
+				"--build=${BUILDMACHINE}",
 				"--host=${CHOST}",
 				"--prefix=/usr"
 			],
@@ -24,11 +23,10 @@
 		{
 			"name": "coreutils",
 			"version": "9.8",
-			"download_method": "https",
-			"git_url": "git@github.com:coreutils/coreutils.git",
 			"download_url": "https://mirror.its.dal.ca/gnu/coreutils/",
 			"configuring_cmd": [
 				"configure",
+				"--build=${BUILDMACHINE}",
 				"--host=${CHOST}",
 				"--without-selinux",
 				"--disable-libcap",
@@ -47,11 +45,10 @@
 		{
 			"name": "util-linux",
 			"version": "2.41.2",
-			"download_method": "https",
-			"git_url": "git@github.com:util-linux/util-linux.git",
 			"download_url": "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/",
 			"configuring_cmd": [
 				"configure",
+				"--build=${BUILDMACHINE}",
 				"--host=${CHOST}",
 				"--disable-liblastlog2",
 				"--prefix=/usr"
@@ -69,11 +66,10 @@
 		{
 			"name": "nano",
 			"version": "8.6",
-			"download_method": "https",
-			"git_url": "",
 			"download_url": "https://mirrors.ocf.berkeley.edu/gnu/nano/",
 			"configuring_cmd": [
 				"configure",
+				"--build=${BUILDMACHINE}",
 				"--host=${CHOST}",
 				"--prefix=/usr"
 			],
