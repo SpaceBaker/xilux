@@ -5,3 +5,7 @@ bootgen/*.bin
 # sources/
 sources/**
 !sources/*.json
+
+# Ignore rootfs (maybe better to only keep the archived image?)
+root
+rootfs
