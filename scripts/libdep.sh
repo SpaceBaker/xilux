@@ -59,14 +59,19 @@ for f in "${FILES[@]}"; do
     # Find lib dep and create dep file
     if [ "$VERBOSE" = true ]; then 
       echo "lib nedded for '${f}' :"
-      echo "$( "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" | grep '\.so' )" | tee -a "${OUTFILE}"
+      "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" | tee -a "${OUTFILE}"
     else
       #echo "$( ${CROSS_COMPILE}readelf -a ${f} | grep '\.so' )"
-      echo "$( "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" | grep '\.so' )" >> "${OUTFILE}"
+      # echo "$( "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" | grep '\.so' )" >> "${OUTFILE}"
+      "${CROSS_COMPILE}ldd" --root "${TOPDIR}" "${f}" >> "${OUTFILE}"
     fi
   fi
 done
 
-# Remove whitespaces
-sed -i '/^[[:space:]]*$/d' "${OUTFILE}"
-
+# Clean up output file
+cat "${OUTFILE}" | \
+	sort -u | \
+	sed -e 's/^[[:space:]]*//g' | \
+	sed -e 's/[[:space:]]*$//g' | \
+	cut -d'(' -f1 | \
+	sed '/not a dynamic executable/d' > "${OUTFILE}.tmp" && mv "${OUTFILE}.tmp" "${OUTFILE}"
