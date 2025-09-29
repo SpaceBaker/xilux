@@ -1,21 +1,29 @@
 #!/usr/bin/env bash
 
+##################################################################
+# Setup a cross-compilation environment
+# Uses crosstool-ng 'Option 3' for 'Assembling a root filesystem'
+#  "Use separate staging and sysroot directories."
+#    sysroot: the directory that contains the toolchain's 
+#						  libraries and headers, 
+#    staging: (aka rootfs) is the target root filesystem
+# See https://crosstool-ng.github.io/docs/toolchain-usage/
+##################################################################
+
+# This is the only variables you should have to modify
+TARGET=arm-none-linux-musleabihf
+CROSS_COMPILER_PATH="${HOME}/x-tools/${TARGET}"
+CROSS_COMPILER_SYSROOT="${CROSS_COMPILER_PATH}/${TARGET}/sysroot"
+
 # Setup cross-compilation environment for ARM Cortex-A9 with NEON support
-if [ -d "${HOME}/x-tools/arm-cortexa9_neon-linux-musleabihf/bin" ]; then
-	echo "Purifing PATH an adding ${HOME}/x-tools/arm-cortexa9_neon-linux-musleabihf/bin"
-	# PATH="${PATH:+${PATH}:}${HOME}/x-tools/arm-cortexa9_neon-linux-musleabihf/bin"
-	PATH="${HOME}/x-tools/arm-cortexa9_neon-linux-musleabihf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
-	BUILDMACHINE="${HOSTTYPE}"
-	export ARCH=arm
-	export CC=arm-cortexa9_neon-linux-musleabihf-gcc
-	export CXX=arm-cortexa9_neon-linux-musleabihf-g++
-	export CHOST=arm-cortexa9_neon-linux-musleabihf
-	export CROSS_COMPILE=arm-cortexa9_neon-linux-musleabihf-
-	export BUILDMACHINE
-else
-	echo "${HOME}/x-tools/arm-cortexa9_neon-linux-musleabihf/bin doesn't exist"
+if [ ! -d "${CROSS_COMPILER_PATH}/bin" ]; then
+	echo "ERROR: No cross compiler detected at ${CROSS_COMPILER_PATH}/bin" >&2
 	exit 1
 fi
+
+# Disable and clear shell hash to ensure that updated PATH is always used
+set +h
+hash -r
 
 # Get the directory of this script, even if it's a symlink
 get_script_dir()
@@ -40,29 +48,51 @@ get_script_dir()
     echo "$SCRIPT_DIR"
 }
 
-# Export useful environment variables
+# Useful environment variables
 SCRIPT_DIR=$(get_script_dir)
-PATH="${PATH:+${PATH}:}${SCRIPT_DIR}:"
 TOP_DIR=$(dirname "${SCRIPT_DIR}")
-ROOT_DIR="${TOP_DIR}/root"
+TARGET_ROOTFS="${TOP_DIR}/root"
 SRC_DIR="${TOP_DIR}/sources"
-export SCRIPT_DIR
-export TOP_DIR
-export ROOT_DIR
-export SRC_DIR
+PATH="${CROSS_COMPILER_PATH}/bin:${SCRIPT_DIR}:${PATH}"
+
+CHOST="${TARGET}"
+ARCH="$(echo "${TARGET}" | cut -d '-' -f1)"
+CROSS_COMPILE="${TARGET}-"
+CC="${CROSS_COMPILE}gcc"
+CXX="${CROSS_COMPILE}g++"
+LD="${CROSS_COMPILE}ld"
+MAKEFLAGS="-j$(nproc)"
+# Pre-processor flags
+CPPFLAGS="-I${TARGET_ROOTFS}/usr/include"
+# C flags
+# CFLAGS="-I${TARGET_ROOTFS}/usr/include"
+# C++ flags
+# C++FLAGS="-I${TARGET_ROOTFS}/usr/include"
+# Linker flags
+LDFLAGS="-L${TARGET_ROOTFS}/usr/lib"
+# LD_LIBRARY_PATH="${TARGET_ROOTFS}/usr/lib"
+export TOP_DIR SCRIPT_DIR TARGET_ROOTFS SRC_DIR TARGET CROSS_COMPILER_PATH CROSS_COMPILER_SYSROOT \
+			 ARCH CC CXX LD CHOST CROSS_COMPILE MAKEFLAGS LDFLAGS CPPFLAGS PATH
 
 echo -e "New environment is :\n\
+	TOP_DIR=${TOP_DIR}\n\
+	SCRIPT_DIR=${SCRIPT_DIR}\n\
+	TARGET_ROOTFS=${TARGET_ROOTFS}\n\
+	SRC_DIR=${SRC_DIR}\n\
+	TARGET=${TARGET}\n\
+	CROSS_COMPILER_PATH=${CROSS_COMPILER_PATH}\n\
+	CROSS_COMPILER_SYSROOT=${CROSS_COMPILER_SYSROOT}\n\
 	ARCH=${ARCH}\n\
 	CC=${CC}\n\
 	CXX=${CXX}\n\
+	LD=${LD}\n\
 	CHOST=${CHOST}\n\
 	CROSS_COMPILE=${CROSS_COMPILE}\n\
-	BUILDMACHINE=${BUILDMACHINE}\n\
-	SCRIPT_DIR=${SCRIPT_DIR}\n\
-	TOP_DIR=${TOP_DIR}\n\
-	ROOT_DIR=${ROOT_DIR}\n\
-	SRC_DIR=${SRC_DIR}\n\
+	MAKEFLAGS=${MAKEFLAGS}\n\
+	CPPFLAGS=${CPPFLAGS}\n\
+	LDFLAGS=${LDFLAGS}\n\
 	PATH=${PATH}"
+# LD_LIBRARY_PATH=${LD_LIBRARY_PATH}\n\
 
 # Clean up
 unset get_script_dir
