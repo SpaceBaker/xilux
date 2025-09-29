@@ -16,21 +16,23 @@ if ! command -v jq &>/dev/null; then
 fi
 
 usage() {
-	echo "Usage: $0"
-	echo "	-c | --configure"
-	echo "	-b | --build"
-	echo "	-i | --install"
-	echo "	-a | --all"
-	echo "	-f | --file <packages.json>"
-	echo "	-l | --list"
-	echo "	--clean"
-	echo "	-h | --help"
-	exit 0
+	echo "Usage: $0 [options]"
+	echo "Options:"
+	echo "  -a, --all            Download, extract, configure, build, and install all packages"
+	echo "  -b, --build          Build packages"
+	echo "  -c, --configure      Configure packages"
+	echo "  -d, --download       Download package tarballs"
+	echo "  -e, --extract        Extract package tarballs"
+	echo "  -f, --file <file>    Specify the packages.json file (default: sources/packages.json)"
+	echo "  -i, --install        Install packages to target root filesystem"
+	echo "  -l, --list           List all packages in the packages.json file"
+	echo "      --clean          Remove downloaded tarballs and extracted directories"
+	echo "  -h, --help           Display this help message"
 }
 
 declare -a name
 declare -a version
-declare -a url
+# declare -a url
 declare -a config_cmd
 declare -a build_cmd
 declare -a install_cmd
@@ -42,24 +44,24 @@ declare -a tarball_url
 declare -a ACTION
 while [[ $# -gt 0 ]]; do
 	case "$1" in
-		-c | --configure)
-			ACTION+=("configure")
+		-a | --all)
+			ACTION+=("all")
 			shift # past argument
 			;;
 		-b | --build)
 			ACTION+=("build")
 			shift # past argument
 			;;
-		-i | --install)
-			ACTION+=("install")
+		-c | --configure)
+			ACTION+=("configure")
 			shift # past argument
 			;;
-		-a | --all)
-			ACTION+=("all")
+	  -d | --download)
+			ACTION+=("download")
 			shift # past argument
 			;;
-		-l | --list)
-			ACTION+=("list")
+		-e | --extract)
+			ACTION+=("extract")
 			shift # past argument
 			;;
 		-f | --file)
@@ -67,13 +69,22 @@ while [[ $# -gt 0 ]]; do
 			shift # past argument
 			shift # past value
 			;;
+		-i | --install)
+			ACTION+=("install")
+			shift # past argument
+			;;
+		-l | --list)
+			ACTION+=("list")
+			shift # past argument
+			;;
 		--clean)
 			ACTION=("clean")
 			shift # past argument
 			;;
 		help|-h|--help)
-		shift # past argument
+		  shift # past argument
 			usage
+			exit 0
 			;;
 		-*)
 			echo "Unknown option $1"
@@ -99,13 +110,13 @@ for pkg in "${packages[@]}"; do
 	# Parse package details
 	name+=("$(echo "${pkg}" | jq -r '.name')")
 	version+=("$(echo "${pkg}" | jq -r '.version')")
-	url+=("$(echo "${pkg}" | jq -r '.download_url')")
+	tarball_url+=("$(echo "${pkg}" | jq -r '.download_url')")
 	config_cmd+=("$(echo "${pkg}" | jq -r '.configuring_cmd | join(" ")')")
 	build_cmd+=("$(echo "${pkg}" | jq -r '.building_cmd | join(" ")')")
 	install_cmd+=("$(echo "${pkg}" | jq -r '.installing_cmd | join(" ")')")
 
 	# Assume tar.gz tarball available
-	tarball_url+=("$(echo "${url[@]: -1}" | sed 's#[^/]$#&/#')${name[@]: -1}-${version[@]: -1}.tar.gz")
+	# tarball_url+=("$(echo "${url[@]: -1}" | sed 's#[^/]$#&/#')${name[@]: -1}-${version[@]: -1}.tar.gz")
 	tarball+=("${SRC_DIR}/${name[@]: -1}-${version[@]: -1}.tar.gz")
 	pkg_dir+=("${SRC_DIR}/${name[@]: -1}-${version[@]: -1}")
 	build_dir+=("${pkg_dir[@]: -1}/build")
@@ -132,25 +143,29 @@ if [[ " ${ACTION[*]} " =~ [[:space:]]clean[[:space:]] ]]; then
 fi
 
 # Download
-for (( i=0; i<nb_pkgs; i++ )); do
-	if [[ ! -f "${tarball[$i]}" ]]; then
-		echo "=== Downloading ${tarball_url[$i]} ==="
-		wget -nc "${tarball_url[$i]}" -O "${tarball[$i]}"
-	fi
-done
+if [[ " ${ACTION[*]} " =~ [[:space:]]download[[:space:]] ]]; then
+	for (( i=0; i<nb_pkgs; i++ )); do
+		if [[ ! -f "${tarball[$i]}" ]]; then
+			echo "=== Downloading ${tarball_url[$i]} ==="
+			wget -nc "${tarball_url[$i]}" -O "${tarball[$i]}"
+		fi
+	done
+fi
 
 # Extract
-for (( i=0; i<nb_pkgs; i++ )); do
-	if [[ ! -d "${pkg_dir[$i]}" ]]; then
-		echo "=== Extracting ${tarball[$i]} ==="
-		tar -xzf "${tarball[$i]}" -C "${SRC_DIR}"
-		# Some tarballs extract to just $name instead of $name-$version
-		if [ ! -d "${pkg_dir[$i]}" ]; then
-			echo -e "Renaming \'${SRC_DIR}/${name[$i]}\' to \'${pkg_dir[$i]}\'"
-			mv "${SRC_DIR}/${name[$i]}" "${pkg_dir[$i]}"
+if [[ " ${ACTION[*]} " =~ [[:space:]]extract[[:space:]] ]]; then
+	for (( i=0; i<nb_pkgs; i++ )); do
+		if [[ ! -d "${pkg_dir[$i]}" ]]; then
+			echo "=== Extracting ${tarball[$i]} ==="
+			tar -xzf "${tarball[$i]}" -C "${SRC_DIR}"
+			# Some tarballs extract to just $name instead of $name-$version
+			if [ ! -d "${pkg_dir[$i]}" ]; then
+				echo -e "Renaming \'${SRC_DIR}/${name[$i]}\' to \'${pkg_dir[$i]}\'"
+				mv "${SRC_DIR}/${name[$i]}" "${pkg_dir[$i]}"
+			fi
 		fi
-	fi
-done
+	done
+fi
 
 # Configure
 if [[ " ${ACTION[*]} " =~ [[:space:]]configure[[:space:]] || " ${ACTION[*]} " =~ [[:space:]]all[[:space:]] ]]; then

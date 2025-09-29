@@ -1,85 +1,99 @@
 {
 	"packages": [
 		{
-			"name": "bash",
-			"version": "5.3",
-			"download_url": "https://mirrors.ibiblio.org/gnu/bash/",
+			"name": "openssl",
+			"version": "3.5.3",
+			"download_url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.3/openssl-3.5.3.tar.gz",
 			"configuring_cmd": [
 				"configure",
-				"--build=${BUILDMACHINE}",
-				"--host=${CHOST}",
 				"--prefix=/usr"
 			],
 			"building_cmd": [
-				"make",
-				"-j$(nproc)"
+				"make"
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${ROOT_DIR}",
+				"DESTDIR=${TARGET_ROOTFS}",
 				"install"
 			]
 		},
 		{
 			"name": "coreutils",
 			"version": "9.8",
-			"download_url": "https://mirror.its.dal.ca/gnu/coreutils/",
+			"download_url": "https://mirror.its.dal.ca/gnu/coreutils/coreutils-9.8.tar.gz",
 			"configuring_cmd": [
 				"configure",
-				"--build=${BUILDMACHINE}",
+				"--build=${MACHTYPE}",
 				"--host=${CHOST}",
 				"--without-selinux",
 				"--disable-libcap",
 				"--prefix=/usr"
 			],
 			"building_cmd": [
-				"make",
-				"-j$(nproc)"
+				"make"
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${ROOT_DIR}",
+				"DESTDIR=${TARGET_ROOTFS}",
+				"install"
+			]
+		},
+		{
+			"name": "bash",
+			"version": "5.3",
+			"download_url": "https://mirrors.ibiblio.org/gnu/bash/bash-5.3.tar.gz",
+			"configuring_cmd": [
+				"configure",
+				"--build=${MACHTYPE}",
+				"--host=${CHOST}",
+				"--prefix=/usr",
+				"--disable-nls"
+			],
+			"building_cmd": [
+				"make"
+			],
+			"installing_cmd": [
+				"make",
+				"DESTDIR=${TARGET_ROOTFS}",
 				"install"
 			]
 		},
 		{
 			"name": "util-linux",
 			"version": "2.41.2",
-			"download_url": "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/",
+			"download_url": "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.2.tar.gz",
 			"configuring_cmd": [
 				"configure",
-				"--build=${BUILDMACHINE}",
+				"--build=${MACHTYPE}",
 				"--host=${CHOST}",
 				"--disable-liblastlog2",
 				"--prefix=/usr"
 			],
 			"building_cmd": [
-				"make",
-				"-j$(nproc)"
+				"make"
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${ROOT_DIR}",
+				"DESTDIR=${TARGET_ROOTFS}",
 				"install"
 			]
 		},
 		{
 			"name": "nano",
 			"version": "8.6",
-			"download_url": "https://mirrors.ocf.berkeley.edu/gnu/nano/",
+			"download_url": "https://mirrors.ocf.berkeley.edu/gnu/nano/nano-8.6.tar.gz",
 			"configuring_cmd": [
 				"configure",
-				"--build=${BUILDMACHINE}",
+				"--build=${MACHTYPE}",
 				"--host=${CHOST}",
 				"--prefix=/usr"
 			],
 			"building_cmd": [
-				"make",
-				"-j$(nproc)"
+				"make"
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${ROOT_DIR}",
+				"DESTDIR=${TARGET_ROOTFS}",
 				"install"
 			]
 		}
