@@ -9,3 +9,4 @@ sources/**
 # Ignore rootfs (maybe better to only keep the archived image?)
 root
 rootfs
+initramfs
