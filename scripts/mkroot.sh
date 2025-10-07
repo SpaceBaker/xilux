@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
 			echo "	--initramfs	Include a basic init script for initramfs (default: false)"
 			exit 0
 			;;
-		-*|--*)
+		-*)
 			echo "Unknown option $1"
 			exit 1
 			;;
@@ -75,7 +75,6 @@ if [ "$INITRAMFS" = true ]; then
 	# Mounts
 	echo "Mounting filesystems..."
 	mount -t devtmpfs dev dev || mdev -s
-	mountpoint -q dev/pts || mount -t devpts dev/pts dev/pts
 	mountpoint -q proc || mount -t proc proc proc
 	mountpoint -q sys || mount -t sysfs sys sys
 
@@ -105,5 +104,7 @@ fi
 # nobody:x:65534:65534:nobody:/proc/self:/dev/null
 # EOF
 # echo -e 'root:x:0:\nguest:x:500:\nnobody:x:65534:' > "${ROOT}"/etc/group || exit 1
+
+# "${TARGET}-populate" -s "$(${CC} -print-sysroot)" -d "${TARGET_ROOTFS}"
 
 echo "Done."
