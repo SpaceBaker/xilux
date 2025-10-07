@@ -1,6 +1,36 @@
 {
 	"packages": [
 		{
+			"name": "ncurses",
+			"version": "6.5",
+			"download_url": "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz",
+			"configuring_cmd": [
+				"configure",
+				"--build=${MACHTYPE}",
+				"--host=${CHOST}",
+				"--prefix=/usr",
+				"--with-install-prefix=${TARGET_ROOTFS}",
+				"--with-shared",
+				"--with-cxx-shared",
+				"--with-pthread",
+				"--without-normal",
+				"--without-debug",
+				"--without-develop",
+				"--without-progs",
+				"--without-tests",
+				"--without-manpages"
+
+			],
+			"building_cmd": [
+				"make"
+			],
+			"installing_cmd": [
+				"make",
+				"DESTDIR=${TARGET_ROOTFS}",
+				"install"
+			]
+		},
+		{
 			"name": "openssl",
 			"version": "3.5.3",
 			"download_url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.3/openssl-3.5.3.tar.gz",
