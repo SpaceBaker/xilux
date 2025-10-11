@@ -9,7 +9,7 @@
 				"--build=${MACHTYPE}",
 				"--host=${CHOST}",
 				"--prefix=/usr",
-				"--with-install-prefix=${TARGET_ROOTFS}",
+				"--with-install-prefix=${ROOTFS_DIR}",
 				"--with-shared",
 				"--with-cxx-shared",
 				"--with-pthread",
@@ -26,7 +26,7 @@
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${TARGET_ROOTFS}",
+				"DESTDIR=${ROOTFS_DIR}",
 				"install"
 			]
 		},
@@ -43,7 +43,7 @@
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${TARGET_ROOTFS}",
+				"DESTDIR=${ROOTFS_DIR}",
 				"install"
 			]
 		},
@@ -64,7 +64,7 @@
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${TARGET_ROOTFS}",
+				"DESTDIR=${ROOTFS_DIR}",
 				"install"
 			]
 		},
@@ -84,7 +84,7 @@
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${TARGET_ROOTFS}",
+				"DESTDIR=${ROOTFS_DIR}",
 				"install"
 			]
 		},
@@ -104,7 +104,7 @@
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${TARGET_ROOTFS}",
+				"DESTDIR=${ROOTFS_DIR}",
 				"install"
 			]
 		},
@@ -123,7 +123,7 @@
 			],
 			"installing_cmd": [
 				"make",
-				"DESTDIR=${TARGET_ROOTFS}",
+				"DESTDIR=${ROOTFS_DIR}",
 				"install"
 			]
 		}

@@ -105,6 +105,6 @@ fi
 # EOF
 # echo -e 'root:x:0:\nguest:x:500:\nnobody:x:65534:' > "${ROOT}"/etc/group || exit 1
 
-# "${TARGET}-populate" -s "$(${CC} -print-sysroot)" -d "${TARGET_ROOTFS}"
+# "${TARGET}-populate" -s "$(${CC} -print-sysroot)" -d "${ROOTFS_DIR}"
 
 echo "Done."

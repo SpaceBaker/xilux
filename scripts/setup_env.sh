@@ -4,15 +4,23 @@
 # Setup a cross-compilation environment
 # Uses crosstool-ng 'Option 3' for 'Assembling a root filesystem'
 #  "Use separate staging and sysroot directories."
-#    sysroot: the directory that contains the toolchain's 
-#						  libraries and headers, 
-#    staging: (aka rootfs) is the target root filesystem
+#
+#    sysroot: is the directory that contains the toolchain's 
+#						  libraries and headers, essential to a minimum 
+#						  working linux system (e.g. ld.so or lib.c.so) 
+#
+#    rootfs: is the target root filesystem. It also provides extra
+#						 librairies and headers (/usr/include).
+#						 When generating the final rootfs image, it is
+#						 possible to removes headers and unused libraires to 
+#						 ower the image's size.
+#
 # See https://crosstool-ng.github.io/docs/toolchain-usage/
 ##################################################################
 
 # This is the only variables you should have to modify
 TARGET=arm-xilux-linux-gnueabihf
-CROSS_COMPILER_PATH="${HOME}/x-tools/${TARGET}"
+CROSS_COMPILER_PATH="/opt/${TARGET}"
 CROSS_COMPILER_SYSROOT="${CROSS_COMPILER_PATH}/${TARGET}/sysroot"
 
 # Setup cross-compilation environment for ARM Cortex-A9 with NEON support
@@ -55,7 +63,7 @@ get_script_dir()
 SCRIPT_DIR=$(get_script_dir)
 TOP_DIR=$(dirname "${SCRIPT_DIR}")
 KERNEL_DIR="${TOP_DIR}/kernel"
-TARGET_ROOTFS="${TOP_DIR}/root"
+ROOTFS_DIR="${TOP_DIR}/rootfs"
 SRC_DIR="${TOP_DIR}/sources"
 PATH="${CROSS_COMPILER_PATH}/bin:${SCRIPT_DIR}:${PATH}"
 CHOST="${TARGET}"
@@ -74,23 +82,23 @@ STRIP="${TARGET}-strip"
 # Make flags
 MAKEFLAGS="-j$(nproc)"
 # Pre-processor flags
-# CPPFLAGS="-I${TARGET_ROOTFS}/usr/include"
+CPPFLAGS="-I${ROOTFS_DIR}/usr/include"
 # C flags
-# CFLAGS="-I${TARGET_ROOTFS}/usr/include"
+# CFLAGS="-I${ROOTFS_DIR}/usr/include"
 # C++ flags
-# CXXFLAGS="-I${TARGET_ROOTFS}/usr/include"
+# CXXFLAGS="-I${ROOTFS_DIR}/usr/include"
 # Linker flags
-# LDFLAGS="-L${TARGET_ROOTFS}/usr/lib"
-# LD_LIBRARY_PATH="${TARGET_ROOTFS}/usr/lib"\
+LDFLAGS="-L${ROOTFS_DIR}/lib -L${ROOTFS_DIR}/usr/lib"
+# LD_LIBRARY_PATH="${ROOTFS_DIR}/usr/lib"\
 
-export SCRIPT_DIR TOP_DIR KERNEL_DIR TARGET_ROOTFS SRC_DIR PATH CHOST \
+export SCRIPT_DIR TOP_DIR KERNEL_DIR ROOTFS_DIR SRC_DIR PATH CHOST \
 			 ARCH CROSS_COMPILE CC CXX CPP AR AS LD RANLIB READELF STRIP MAKEFLAGS
 
 echo -e "New environment is :\n\
 	TOP_DIR=${TOP_DIR}\n\
 	SCRIPT_DIR=${SCRIPT_DIR}\n\
 	KERNEL_DIR=${KERNEL_DIR}\n\
-	TARGET_ROOTFS=${TARGET_ROOTFS}\n\
+	ROOTFS_DIR=${ROOTFS_DIR}\n\
 	SRC_DIR=${SRC_DIR}\n\
 	TARGET=${TARGET}\n\
 	CROSS_COMPILER_PATH=${CROSS_COMPILER_PATH}\n\
