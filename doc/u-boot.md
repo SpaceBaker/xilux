@@ -1,21 +1,64 @@
-U-Boot
-=========================
+# U-Boot
 
-# TFTP
+## Requirements
 
-If enabled, U-Boot provide a tftp utility that makes it possible to download 
-files to your target system over LAN. This is helpful in the development phase, 
-when you need to tweak kernel, dt or filesystems. Without this, you would have
+You must install the following packages on your host/build machine :
+
+```bash
+sudo apt-get install \
+  bc bison build-essential coccinelle device-tree-compiler\
+  dfu-util efitools flex gdisk graphviz imagemagick \
+  libgnutls28-dev libguestfs-tools libncurses-dev \
+  libpython3-dev libsdl2-dev libssl-dev lz4 lzma lzma-alone openssl \
+  pkg-config python3 python3-asteval python3-coverage python3-filelock \
+  python3-pkg-resources python3-pycryptodome python3-pyelftools \
+  python3-pytest python3-pytest-xdist python3-sphinxcontrib.apidoc \
+  python3-sphinx-rtd-theme python3-subunit python3-testtools \
+  python3-venv swig uuid-dev
+```
+
+## Compiling
+
+Make sure you source the environment first  
+`source script/set_env.sh`
+
+1. `cd u-boot`
+
+2. `make xilinx_zynq_virt_defconfig`  
+This step load the generic config for a zynq board
+
+3. `make menuconfig`  
+In this step, you can fine tune the config
+
+4. `make`  
+This step will produce the binary in multiple formats.  
+In our case, we require 'u-boot.elf'.
+
+## Installing on the target
+
+To use U-BOOT in your embedded system, it must be install somewhere in its memory.
+
+An SD card is often used for its convinience, as it is a removable device.  
+Other options are available, such as FLASH (NOR / NAND), eMMC or EEPROM.
+
+To install U-BOOT on an SD card, read the `sdcard.md` file located in `doc` folder of this project.
+
+To install U-BOOT on the FLASH through QUAD-SPI, read the `qspi-flash.md` file located in `doc` folder of this project.
+
+## TFTP
+
+If enabled, U-Boot provide a tftp utility that makes it possible to download  
+files to your target system over LAN. This is helpful in the development phase,  
+when you need to tweak kernel, dt or filesystems. Without this, you would have  
 to constantly insert/eject an sd card between your dev machine and your target.
 
-## Install/run a tftp server ou your dev machine
+### Install/run a tftp server ou your dev machine
 
-If not already done, you can follow the following  link as an exemple for a 
-linux machine.
+If not already done, you can follow the following  link as an exemple for a linux machine.
 
 [Installing and Configuring a TFTP Server on Linux](https://www.baeldung.com/linux/tftp-server-install-configure-test)
 
-## Configure network on the target machine
+### Configure network on the target machine
 
 If not done in a script, you can either manually give an ip address :  
 `setenv ipaddr <ip-addr>`  
@@ -31,7 +74,7 @@ You can save these addresses into the U-Boot environement :
 `saveenv`  
 You'll then be able to skip this step from now on.
 
-## Transfering files
+### Transfering files
 
 1. On your dev machine, point your tftp server to the folder to share.  
 2. Copy/Move files you wish to share to that folder.  
@@ -39,36 +82,3 @@ You'll then be able to skip this step from now on.
 `tftp <ram_addr> <filename>`
 
 NOTE : the last downloaded file will have its size saved in the '$filesize' variable
-
-# Quad SPI flash programming
-
-## Select the device
-
-To select the device, use this command :  
-`sf probe <bus>:<devnum>`
-
-Note: for ZC706, it is 0:0
-
-## Erase the memory
-
-To erase the memory, use the following command :  
-`sf erase <start_addr> <size_in_bytes>`
-
-Note : for ZC706, the full size of the memory is 32MiB (0x2000000)
-
-## Write to memory
-
-To write to memory, use the following command :  
-`sf write <ram_addr> <qspi_flash_addr> <size_in_bytes>`
-
-- <ram_addr> is where the data we want to write (store in memory) is located.  
-    For exemple, a previously downloaded from tftp FSBL binary.  
-- <qspi_flash_addr> read from the datasheet, sometimes you need to leave an offset...  
-- <size_in_bytes> if you previously downloaded through ftp, you can pass the '$filesize' variable,  
-    which as been automatically set by tftp.
-
-## Boot configuration
-
-Make sur you set the right boot switches to boot from QUAD-SPI.
-
-NOTE: for ZC706, the boot switches for QUAD-SPI is as followed -> 0b01000
