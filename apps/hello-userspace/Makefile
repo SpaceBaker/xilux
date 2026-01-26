@@ -1,108 +1,70 @@
-#----------------------------------------------------------------------
-#	Makefile
-#----------------------------------------------------------------------
+#################################################################################
+# Makefile template provided by : 												#
+#	Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/) #
+#################################################################################
 
-ifndef CROSS_COMPILE
-$(warning "Your environment is not set!)
-$(error "Please source 'scripts/setup_env.sh'")
-endif
+TARGET_EXEC := $(notdir $(CURDIR))
 
-#------------- APP_NAME -------------
-APP_NAME = hello
+BUILD_DIR := build
+SRC_DIRS := src
 
-#------------- Working directories -------------
-SRC_DIR	   = src
-BUILD_DIR  = build
-BIN_DIR    = $(BUILD_DIR)/bin
-OBJ_DIR    = $(BUILD_DIR)/obj
-# MAKE_SCRIPT_DIR = mk
+# Find all the C and C++ files we want to compile
+# Note the single quotes around the * expressions. The shell will incorrectly expand these otherwise, but we want to send the * directly to the find command.
+SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 
-# List source files here
-SRCS =	$(wildcard $(SRC_DIR)/*.c)
+# Prepends BUILD_DIR and appends .o to every src file
+# As an example, ./your_dir/hello.cpp turns into ./build/./your_dir/hello.cpp.o
+OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
-# List header file directories here
-INCS =	$(SRC_DIR)
+# String substitution (suffix version without %).
+# As an example, ./build/hello.cpp.o turns into ./build/hello.cpp.d
+DEPS := $(OBJS:.o=.d)
 
-# List library directories here
-LIBS = 
+# Every folder in ./src will need to be passed to GCC so that it can find header files
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+# Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-#------------- Defines -------------
-DEFS = 
+# The -MMD and -MP flags together generate Makefiles for us!
+# These files will have .d instead of .o as the output.
+CPPFLAGS := $(CPPFLAGS) $(INC_FLAGS) -MMD -MP
 
-#------------- Optimization Level -------------
-OPT	= -O2
+CFLAGS := $(CFLAGS) -fPIC
 
-#------------- Warnings Options -------------
-WARNS = -Wall -Wundef -Wextra -Werror
+LDFLAGS := $(LDFLAGS) -pie -s
 
-#------------- Debugging Format -------------
-DEBUG = 
+.PHONY: all info
+all: $(BUILD_DIR)/$(TARGET_EXEC)
+	@echo $(TARGET_EXEC) done.
 
-#------------- C Language ISO Standard -------------
-CSTD = -std=c23
+info:
+	@echo CC:$(CC)
+	@echo CXX:$(CXX)
+	@echo cppflags:$(CPPFLAGS)
+	@echo cflags:$(CFLAGS)
+	@echo c++flags:$(CXXFLAGS)
+	@echo ldflags:$(LDFLAGS)
 
-#------------- Verbose -------------
-# Comment the line to disable verbose output
-# VERB = -v
+# The final build step.
+$(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
+	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
+
+# Build step for C source
+$(BUILD_DIR)/%.c.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+# Build step for C++ source
+$(BUILD_DIR)/%.cpp.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
-#---------------------------------------------------------------------------------
-# DO NOT EDIT BELOW THIS LINE, UNLESS YOU KNOW WHAT YOU ARE DOING
-#---------------------------------------------------------------------------------
-
-#------------- C Compiler Flags -------------
-CFLAGS = $(VERB) $(OPT) $(DEBUG) $(WARNS) $(addprefix -I, $(INCS)) $(CSTD) $(DEFS) -fPIC
-
-#------------- C Linker Flags -------------
-LDFLAGS = $(VERB) -pie -s $(LIBS)
-
-#------------- Objects -------------
-OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
-
-
-#------------- Rules for building the elf file -------------
-.PHONY: all
-
-all: $(BIN_DIR)/$(APP_NAME)
-
-$(BIN_DIR)/$(APP_NAME): $(OBJS)
-	@echo Linking $<
-	@mkdir -p $(@D)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@echo Compiling $<
-	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-#------------- Other Rules -------------
 .PHONY: clean
-
 clean:
-	@rm -rv $(BUILD_DIR)/*
+	@rm -rf $(BUILD_DIR)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ------------------- NOTES -------------------------------------------------------------
-# Automatic Variables
-# Automatic variables are set by make after a rule is matched. There include:
-
-# $@: the target filename.
-# $*: the target filename without the file extension.
-# $<: the first prerequisite filename.
-# $^: the filenames of all the prerequisites, separated by spaces, discard duplicates.
-# $+: similar to $^, but includes duplicates.
-# $?: the names of all prerequisites that are newer than the target, separated by spaces.
+# Include the .d makefiles. The - at the front suppresses the errors of missing
+# Makefiles. Initially, all the .d files will be missing, and we don't want those
+# errors to show up.
+-include $(DEPS)

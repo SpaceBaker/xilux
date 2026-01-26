@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/utsname.h>
+#include "hello-userspace.h"
 
 int main() {
     // Create a struct to hold system information
@@ -13,7 +14,7 @@ int main() {
         return 1;
     }
 
-    printf("Hello from the userspace!\n");
+    printf(HELLO_STR);
     printf("This app was cross-compiled\n");
     printf("-------------------------------------\n");
     printf("System Name:  %s\n", sys_info.sysname);

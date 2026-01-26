@@ -12,5 +12,4 @@ rootfs
 initramfs
 
 # build binaries and artefacts
-apps/*/build/bin
-apps/*/build/obj
+apps/*/build
