@@ -130,7 +130,7 @@ mkdir -p /mnt/boot
 mount /dev/sdX1 /mnt/boot
 ```
 
-10. Copy the boot.bin or contents of the release archive to the SD card, e.g.
+10. Copy the boot.bin, the kernel image and whatever else you need for U-BOOT into the SD card, e.g.
 
 `cp boot.bin /mnt/boot/`
 

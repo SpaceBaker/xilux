@@ -45,6 +45,50 @@ To install U-BOOT on an SD card, read the `sdcard.md` file located in `doc` fold
 
 To install U-BOOT on the FLASH through QUAD-SPI, read the `qspi-flash.md` file located in `doc` folder of this project.
 
+## SD/MMC boot
+
+### Legacy
+
+1. Load the kernel into ram  
+`fatload ${devtype} ${devnum}:${partitionNum} ${kernel_addr_r} ${kernel_name}`
+
+2. Load the device tree blob (dtb) aka. 'flattened device tree' (fdt) into ram  
+`fatload ${devtype} ${devnum}:${partitionNum} ${fdt_addr_r} ${dtb_name}`
+
+3. Point the newly loaded dtb to U-BOOT (this step is nedded to access dtb info)  
+`fdt addr ${fdt_addr_r}`
+
+4. (Option 1) Load the initramfs and setup the bootargs  
+`fatload ${devtype} ${devnum}:${partitionNum} ${ramdisk_addr_r} ${ramdisk_name}`  
+!!! TODO !!! `setenv bootargs "rootfstype=ramfs"`
+
+5. (Option 2) Setup the bootargs for non-volatile rootfs  
+`setenv bootargs "root=/dev/mmcblk${devnum}p${partitionNum} rootfstype=${fsType} ro rootwait rw"`
+
+6. Boot (if unused, replace the address wit a dash '-')  
+`bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}`
+
+Example for rootfs:
+
+```sh
+fatload mmc 0:1 ${kernel_addr_r} uImage
+fatload mmc 0:1 ${fdt_addr_r} zynq-zc706.dtb
+fdt addr ${fdt_addr_r}
+setenv bootargs "root=/dev/mmcblk0p2 rootfstype=ext4 earlycon ro rootwait rw"
+bootm ${kernel_addr_r} - ${fdt_addr_r}
+```
+
+Example for initramfs:
+
+```sh
+fatload mmc 0:1 ${kernel_addr_r} uImage  
+fatload mmc 0:1 ${fdt_addr_r} zynq-zc706.dtb
+fdt addr ${fdt_addr_r}
+fatload mmc 0:1 ${ramdisk_addr_r} initramfs.cpio.gz
+setenv bootargs "rootfstype=initramfs"
+bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
+```
+
 ## TFTP
 
 If enabled, U-Boot provide a tftp utility that makes it possible to download  
@@ -54,7 +98,7 @@ to constantly insert/eject an sd card between your dev machine and your target.
 
 ### Install/run a tftp server ou your dev machine
 
-If not already done, you can follow the following  link as an exemple for a linux machine.
+If not already done, you can follow the following  link as an example for a linux machine.
 
 [Installing and Configuring a TFTP Server on Linux](https://www.baeldung.com/linux/tftp-server-install-configure-test)
 
@@ -82,3 +126,17 @@ You'll then be able to skip this step from now on.
 `tftp <ram_addr> <filename>`
 
 NOTE : the last downloaded file will have its size saved in the '$filesize' variable
+
+## TFTP boot
+
+### Legacy
+
+```sh
+dhcp
+setenv serverip 192.168.86.20
+tftp ${kernel_addr_r} uImage
+tftp ${fdt_addr_r} zynq-zc706.dtb
+tftp ${ramdisk_addr_r} initramfs.cpio.gz.ub
+fdt addr ${fdt_addr_r}
+bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
+```
