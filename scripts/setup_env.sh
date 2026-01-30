@@ -20,7 +20,7 @@
 
 # This is the only variables you should have to modify
 TARGET=arm-xilux-linux-gnueabihf
-CROSS_COMPILER_PATH="/opt/${TARGET}"
+CROSS_COMPILER_PATH="/opt/x-tools/${TARGET}"
 CROSS_COMPILER_SYSROOT="${CROSS_COMPILER_PATH}/${TARGET}/sysroot"
 
 # Setup cross-compilation environment for ARM Cortex-A9 with NEON support
@@ -80,7 +80,7 @@ RANLIB="${TARGET}-ranlib"
 READELF="${TARGET}-readelf"
 STRIP="${TARGET}-strip"
 # Make flags
-MAKEFLAGS="-j$(nproc)"
+MAKEFLAGS="--no-print-directory -j$(nproc)"
 # Pre-processor flags
 CPPFLAGS="-I${ROOTFS_DIR}/usr/include"
 # C flags
@@ -92,7 +92,8 @@ LDFLAGS="-L${ROOTFS_DIR}/lib -L${ROOTFS_DIR}/usr/lib"
 # LD_LIBRARY_PATH="${ROOTFS_DIR}/usr/lib"\
 
 export SCRIPT_DIR TOP_DIR KERNEL_DIR ROOTFS_DIR SRC_DIR PATH CHOST \
-			 ARCH CROSS_COMPILE CC CXX CPP AR AS LD RANLIB READELF STRIP MAKEFLAGS
+			 ARCH CROSS_COMPILE CC CXX CPP AR AS LD RANLIB READELF STRIP MAKEFLAGS \
+			 CPPFLAGS LDFLAGS
 
 echo -e "New environment is :\n\
 	TOP_DIR=${TOP_DIR}\n\
