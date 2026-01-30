@@ -9,7 +9,21 @@ sources/**
 # Ignore rootfs (maybe better to only keep the archived image?)
 root
 rootfs
+rootfs_staging
 initramfs
 
-# build binaries and artefacts
+# Binaries and objects generated from userspace applications build
 apps/*/build
+
+# Binaries and objects generated from kernel module build
+modules/*/*.o
+modules/*/*.ko
+modules/*/*.cmd
+modules/*/*.mod
+modules/*/*.mod.c
+modules/*/Module.symvers
+modules/*/modules.order
+modules/*/.tmp_versions/
+
+# Generic
+*.bak
