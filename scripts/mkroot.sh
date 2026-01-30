@@ -44,10 +44,11 @@ set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 # Create the ROOT file structure based on TYPE
 if [ "$TYPE" == "fhs" ]; then
 	echo "Creating FHS root filesystem at ${ROOT}..."
-	mkdir -v -p "${ROOT}"/{bin,boot,dev,lib,sbin,home,media,mnt,opt,proc,root,run,srv,sys,tmp} || exit 1
-	mkdir -v -p "${ROOT}"/etc/{opt,init.d} || exit 1
+	mkdir -v -p "${ROOT}"/{boot,dev,home,media,mnt,opt,proc,root,run,srv,sys,tmp} || exit 1
+	mkdir -v -p "${ROOT}"/etc/init.d || exit 1
 	mkdir -v -p "${ROOT}"/usr/{bin,include,lib,local,sbin,share,src} || exit 1
 	mkdir -v -p "${ROOT}"/var/{cache,lock,log,opt,tmp} || exit 1
+	ln -v -s usr/{bin,sbin,lib} "${ROOT}" || exit 1
 	chmod -v a+rwxt "${ROOT}"/tmp || exit 1
 elif [ "$TYPE" == "minimal" ]; then
 	echo "Creating a minimal root filesystem at ${ROOT}..."
