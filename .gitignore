@@ -6,11 +6,8 @@ bootgen/*.bin
 sources/**
 !sources/*.json
 
-# Ignore rootfs (maybe better to only keep the archived image?)
-root
-rootfs
-rootfs_staging
-initramfs
+# Ignore rootfs_staging
+rootfs_staging*
 
 # Binaries and objects generated from userspace applications build
 apps/*/build
