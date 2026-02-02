@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-ROOT="root"
+ROOT="rootfs_staging"
 TYPE="minimal"
-INITRAMFS=false
 
 # Check args
 while [[ $# -gt 0 ]]; do
@@ -17,15 +16,10 @@ while [[ $# -gt 0 ]]; do
 			shift # past argument
 			shift # past value
 			;;
-		--initramfs)
-			INITRAMFS=true
-			shift # past argument
-			;;
 		-h|--help)
-			echo "Usage: $0 [-r|--root <root_directory>] [-t|--type <fhs|minimal>] [--initramfs]"
+			echo "Usage: $0 [-r|--root <root_directory>] [-t|--type <fhs|minimal>]"
 			echo "	-r, --root	Specify the root directory to create (default: 'root')"
 			echo "	-t, --type	Specify the type of root filesystem: 'fhs' or 'minimal' (default: 'minimal')"
-			echo "	--initramfs	Include a basic init script for initramfs (default: false)"
 			exit 0
 			;;
 		-*)
@@ -64,48 +58,5 @@ fi
 if [ -e "${ROOT}/PLACEHOLDER" ]; then
 	rm -v "${ROOT}"/PLACEHOLDER
 fi
-
-# Write template init script. Runs as pid 1 from initramfs to set up and hand off system.
-if [ "$INITRAMFS" = true ]; then
-	echo "Adding initramfs init script..."
-	cat <<- "EOF" >"${ROOT}"/init
-	#!/bin/sh
-
-	export HOME=/home PATH=/bin:/sbin
-
-	# Mounts
-	echo "Mounting filesystems..."
-	mount -t devtmpfs dev dev || mdev -s
-	mountpoint -q proc || mount -t proc proc proc
-	mountpoint -q sys || mount -t sysfs sys sys
-
-	# Networking
-	## loopback device
-	echo "Setting up loopback network interface..."
-	ip link add lo type dummy
-	ip addr add 127.0.0.1/32 dev lo
-	ip link set lo up
-
-	# Hand off to shell
-	echo "Boot took $(cut -d' ' -f1 /proc/uptime) seconds"
-	echo "Done init, starting shell..."
-	exec /bin/sh
-	EOF
-
-	chmod +x "${ROOT}"/init
-fi
-
-#####################################################################
-
-# Google's nameserver, passwd+group with special (root/nobody) accounts + guest
-# echo "nameserver 8.8.8.8" > "${ROOT}"/etc/resolv.conf &&
-# cat > "${ROOT}"/etc/passwd << 'EOF' &&
-# root:x:0:0:root:/root:/bin/sh
-# guest:x:500:500:guest:/home/guest:/bin/sh
-# nobody:x:65534:65534:nobody:/proc/self:/dev/null
-# EOF
-# echo -e 'root:x:0:\nguest:x:500:\nnobody:x:65534:' > "${ROOT}"/etc/group || exit 1
-
-# "${TARGET}-populate" -s "$(${CC} -print-sysroot)" -d "${ROOTFS_DIR}"
 
 echo "Done."
