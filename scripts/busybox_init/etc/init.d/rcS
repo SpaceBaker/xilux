@@ -1,0 +1,57 @@
+#!/bin/sh
+
+#########################################################
+# Mounting pseudo-filesystems like /dev, /sys and /proc #
+# aswell as user-defined filesystems/mountpoints        #
+#########################################################
+
+mountpoint -q dev  || mount -t devtmpfs -o mode=0755 dev /dev
+mountpoint -q sys  || mount -t sysfs sys /sys
+mountpoint -q proc || mount -t proc proc /proc
+mountpoint -q tmp  || mount -t tmpfs tmpfs /tmp
+# Read /etc/fstab (Commented out since we don't have one)
+# mount -a
+
+#######################################################################################
+# Runs the coldplug procedure using the device manager, mdev,                         #
+# which ensures that device nodes in /dev are set up and have the correct permissions #
+#######################################################################################
+
+# Execute mdev every time a device node related event is triggered
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+
+# The -s flag tells mdev to trigger events for initial node population
+# which would then be handled by mdev itself when it is fork+exec'd by the kernel
+/sbin/mdev -s
+
+#################################################
+# Setup the loopback network device (localhost) #
+#################################################
+ip link add lo type dummy
+ip addr add 127.0.0.1/32 dev lo
+ip link set lo up
+
+##############################################################
+# Start all init scripts fomr /etc/init.d in numerical order #
+##############################################################
+
+for i in /etc/init.d/S??* ;do
+    # Ignore dangling symlinks (if any).
+    [ ! -f "$i" ] && continue
+
+    case "$i" in
+        *.sh)
+            # Source shell script for speed.
+            (
+                trap - INT QUIT TSTP
+                set start
+                . $i
+            )
+            ;;
+        *)
+            # No sh extension, so fork subprocess.
+            $i start
+            ;;
+    esac
+done
+

@@ -1,0 +1,25 @@
+# /etc/inittab init(8) configuration for BusyBox
+#
+# format: <id>:<runlevels>:<action>:<process>
+
+# System initialization scripts
+::sysinit:/etc/init.d/rcS
+
+# Start an "askfirst" shell on the console (whatever that may be)
+# ::askfirst:/bin/ash
+
+# Start an "askfirst" shell on /dev/tty2-4
+# tty2::askfirst:-/bin/sh
+# tty3::askfirst:-/bin/sh
+# tty4::askfirst:-/bin/sh
+
+# put a getty on a serial line
+::respawn:/sbin/getty -L ttyPS0 115200 vt100
+
+# Stuff to do when restarting the init process
+::restart:/sbin/init
+
+# Stuff to do before rebooting
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount -a -r
+# ::shutdown:/sbin/swapoff -a

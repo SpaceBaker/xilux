@@ -43,6 +43,12 @@ rm -v "${ROOTFS_DIR}/lib/modules/$(make -C ${KERNEL_DIR} kernelrelease)/build"
 # Add userspace apps
 add_all_apps
 
+# BusyBox
+## Add init scripts
+cp -r ${SCRIPT_DIR}/busybox_init/* "${ROOTFS_DIR}"
+## Add busybox bin
+make -C "${SRC_DIR}/busybox" CONFIG_PREFIX="${ROOTFS_DIR}" install
+
 # Add all libraries
 ## Uses crosstool-ng built-in script "populate"
 "${CROSS_COMPILE}populate" -v -s "${ROOTFS_DIR}" -d "${ROOTFS_DIR}-populated"
