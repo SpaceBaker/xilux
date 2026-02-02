@@ -63,7 +63,7 @@ To install U-BOOT on the FLASH through QUAD-SPI, read the `qspi-flash.md` file l
 !!! TODO !!! `setenv bootargs "rootfstype=ramfs"`
 
 5. (Option 2) Setup the bootargs for non-volatile rootfs  
-`setenv bootargs "root=/dev/mmcblk${devnum}p${partitionNum} rootfstype=${fsType} ro rootwait rw"`
+`setenv bootargs "console=ttyPS0,115200 root=/dev/mmcblk${devnum}p${partitionNum} rootfstype=${fsType} ro rootwait rw"`
 
 6. Boot (if unused, replace the address wit a dash '-')  
 `bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}`
@@ -74,7 +74,7 @@ Example for rootfs:
 fatload mmc 0:1 ${kernel_addr_r} uImage
 fatload mmc 0:1 ${fdt_addr_r} zynq-zc706.dtb
 fdt addr ${fdt_addr_r}
-setenv bootargs "root=/dev/mmcblk0p2 rootfstype=ext4 earlycon ro rootwait rw"
+setenv bootargs "console=ttyPS0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 earlycon ro rootwait rw"
 bootm ${kernel_addr_r} - ${fdt_addr_r}
 ```
 
@@ -85,7 +85,7 @@ fatload mmc 0:1 ${kernel_addr_r} uImage
 fatload mmc 0:1 ${fdt_addr_r} zynq-zc706.dtb
 fdt addr ${fdt_addr_r}
 fatload mmc 0:1 ${ramdisk_addr_r} initramfs.cpio.gz
-setenv bootargs "rootfstype=initramfs"
+setenv bootargs "console=ttyPS0,115200 rootfstype=initramfs"
 bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
 ```
 
