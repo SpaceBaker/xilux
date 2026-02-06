@@ -6,8 +6,9 @@ bootgen/*.bin
 sources/**
 !sources/*.json
 
-# Ignore rootfs_staging
+# Ignore rootfs stuffs
 rootfs_staging*
+*.cpio*
 
 # Binaries and objects generated from userspace applications build
 apps/*/build
