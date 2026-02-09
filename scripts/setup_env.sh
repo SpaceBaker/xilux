@@ -63,7 +63,7 @@ get_script_dir()
 SCRIPT_DIR=$(get_script_dir)
 TOP_DIR=$(dirname "${SCRIPT_DIR}")
 KERNEL_DIR="${TOP_DIR}/kernel"
-ROOTFS_DIR="${TOP_DIR}/rootfs"
+ROOTFS_DIR="${TOP_DIR}/rootfs_staging"
 SRC_DIR="${TOP_DIR}/sources"
 PATH="${CROSS_COMPILER_PATH}/bin:${SCRIPT_DIR}:${PATH}"
 CHOST="${TARGET}"
@@ -82,18 +82,17 @@ STRIP="${TARGET}-strip"
 # Make flags
 MAKEFLAGS="--no-print-directory -j$(nproc)"
 # Pre-processor flags
-CPPFLAGS="-I${ROOTFS_DIR}/usr/include"
+# CPPFLAGS="-I${ROOTFS_DIR}/usr/include"
 # C flags
 # CFLAGS="-I${ROOTFS_DIR}/usr/include"
 # C++ flags
 # CXXFLAGS="-I${ROOTFS_DIR}/usr/include"
 # Linker flags
-LDFLAGS="-L${ROOTFS_DIR}/lib -L${ROOTFS_DIR}/usr/lib"
+# LDFLAGS="-L${ROOTFS_DIR}/lib -L${ROOTFS_DIR}/usr/lib"
 # LD_LIBRARY_PATH="${ROOTFS_DIR}/usr/lib"\
 
-export SCRIPT_DIR TOP_DIR KERNEL_DIR ROOTFS_DIR SRC_DIR PATH CHOST \
-	ARCH CROSS_COMPILE CC CXX CPP AR AS LD RANLIB READELF STRIP MAKEFLAGS \
-	CPPFLAGS LDFLAGS
+export	SCRIPT_DIR TOP_DIR KERNEL_DIR ROOTFS_DIR SRC_DIR PATH CHOST ARCH CROSS_COMPILE \
+		CC CXX CPP AR AS LD RANLIB READELF STRIP MAKEFLAGS CPPFLAGS LDFLAGS
 
 echo -e "New environment is :\n\
 	TOP_DIR=${TOP_DIR}\n\
