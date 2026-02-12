@@ -1,0 +1,105 @@
+/dts-v1/;
+
+/ {
+    description = "Xilux various kernels, ramdisks and FDT blobs";
+    #address-cells = <1>;
+
+    images {
+        kernel-dev {
+            description = "Xilux development kernel";
+            data = /incbin/("./uImage-dev.gz");
+            type = "kernel";
+            arch = "arm";
+            os = "linux";
+            compression = "gzip";
+            load = <0x2000000>;
+            entry = <0x2000000>;
+        };
+
+        kernel-rel {
+            description = "Xilux release kernel";
+            data = /incbin/("./uImage-rel.gz");
+            type = "kernel";
+            arch = "arm";
+            os = "linux";
+            compression = "gzip";
+            load = <0x2000000>;
+            entry = <0x2000000>;
+        };
+
+        initramfs {
+            description = "Xilux initramfs";
+            data = /incbin/("./uinitramfs.cpio.lzma");
+            type = "ramdisk";
+            arch = "arm";
+            os = "linux";
+            compression = "none";
+            load = <0x3100000>;
+            entry = <0x3100000>;
+        };
+
+        fdt-zc706 {
+            description = "Xilux ZC706 board fdt";
+            data = /incbin/("./xilux-zc706.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+            load = <0x1f00000>;
+        };
+
+        fdt-zc702 {
+            description = "Xilux ZC702 board fdt";
+            data = /incbin/("./xilux-zc702.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+            load = <0x1f00000>;
+        };
+    };
+
+    configurations {
+        default = "config-1";
+
+        config-0 {
+            description = "ZC706 development configuration";
+            kernel = "kernel-dev";
+            ramdisk = "initramfs";
+            fdt = "fdt-zc706";
+        };
+
+        config-1 {
+            description = "ZC706 release configuration";
+            kernel = "kernel-rel";
+            ramdisk = "initramfs";
+            fdt = "fdt-zc706";
+        };
+
+        config-2 {
+            description = "ZC706 initramfs configuration";
+            kernel = "kernel-dev";
+            ramdisk = "initramfs";
+            fdt = "fdt-zc706";
+        };
+
+        config-3 {
+            description = "ZC702 development configuration";
+            kernel = "kernel-dev";
+            ramdisk = "initramfs";
+            fdt = "fdt-zc702";
+        };
+
+        config-4 {
+            description = "ZC702 release configuration";
+            kernel = "kernel-rel";
+            ramdisk = "initramfs";
+            fdt = "fdt-zc702";
+        };
+
+        config-5 {
+            description = "ZC702 initramfs configuration";
+            kernel = "kernel-dev";
+            ramdisk = "initramfs";
+            fdt = "fdt-zc702";
+        };
+    };
+};
