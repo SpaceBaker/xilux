@@ -7,34 +7,24 @@ TYPE="none"
 OUTPUT="initramfs"
 compTypes=("bzip2" "gzip" "lz4" "lzma" "lzo" "none" "xc" "zstd")
 
-
-# compression_type_check() {
-# 	for compType in ${compTypes[@]}; do
-# 		if [[ $1 == "${compType}" ]]; then
-# 			echo 0
-# 			return
-# 		fi
-# 	done
-
-# 	echo 1
-# }
-
 # Check args
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		-r|--rootfs)
 			ROOTFS="$2"
+			if [ -z "$2" ]; then
+				echo "rootfs cannot be empty"
+				exit 1
+			fi
 			shift # past argument
 			shift # past value
 			;;
 		-c|--compression-type)
 			TYPE="$2"
-			
-			# if [[ $(compression_type_check "${TYPE}") -ne 0  ]]; then
-			# 	echo "Invalid compression type ${TYPE}"
-			# 	echo "Supported are: ${compTypes[*]}"
-			# 	exit 1
-			# fi
+			if [ -z "$2" ]; then
+				echo "compression-type cannot be empty"
+				exit 1
+			fi
 			shift # past argument
 			shift # past value
 			;;
@@ -43,14 +33,14 @@ while [[ $# -gt 0 ]]; do
 				echo "output cannot be empty"
 				exit 1
 			fi
-			TYPE="$2"
+			OUTPUT="$2"
 			shift # past argument
 			shift # past value
 			;;
 		-h|--help)
 			echo "Usage: $0 [-r|--rootfs <rootfs_directory>] [-t|--type <none|gz|xz>] [-o|--output <output_filename>]"
 			echo "	-r, --root	Specify the rootfs directory to compress (default: 'rootfs_staging')"
-			echo "	-t, --type	Specify the compression algorithm type for initramfs: 'none', 'gz', 'xz' (default: 'none')"
+			echo "	-c, --compression-type	Specify the compression algorithm type for initramfs: ${compTypes[*]} (default: 'none')"
 			echo "	-o, --output	Specify the output filename (without extensions) of the initramfs (default: 'initramfs')"
 			exit 0
 			;;
@@ -75,7 +65,7 @@ case "${TYPE}" in
 		find . -print0 | cpio --null --create --format=newc | bzip2 -z --best > "../${OUTPUT}"
 		;;
 	"gzip")
-		OUTPUT="${OUTPUT}.cpio.gzip"
+		OUTPUT="${OUTPUT}.cpio.gz"
 		find . -print0 | cpio --null --create --format=newc | gzip --best > "../${OUTPUT}"
 		;;
 	"lz4")
@@ -84,9 +74,9 @@ case "${TYPE}" in
 		;;
 	"lzma"|"xz")
 		TYPE="lzma"
-		OUTPUT="${OUTPUT}.cpio.xz"
+		OUTPUT="${OUTPUT}.cpio.lzma"
 		# TOCHECK do we need the --format="lzma" flag ?
-		find . -print0 | cpio --null --create --format=newc | xz -z --best > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | xz -z --format="lzma" --best > "../${OUTPUT}"
 		;;
 	"lzo")
 		OUTPUT="${OUTPUT}.cpio.lzo"
@@ -108,7 +98,7 @@ case "${TYPE}" in
 esac
 
 cd ..
-mkimage -n "Ramdisk Image" -A arm -O linux -T ramdisk -C "${TYPE}" -d "${OUTPUT}" "${OUTPUT}".ub
+mkimage -n "Ramdisk Image" -A arm -O linux -T ramdisk -C "${TYPE}" -d "${OUTPUT}" "u${OUTPUT}"
 echo "done."
 
 exit 0
