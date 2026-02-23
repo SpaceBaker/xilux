@@ -1,14 +1,6 @@
-# BOOTGEN
-bootgen/*.BIN
-bootgen/*.bin
-
 # sources/
 sources/**
 !sources/*.json
-
-# Ignore rootfs stuffs
-rootfs_staging*
-*.cpio*
 
 # Binaries and objects generated from userspace applications build
 apps/*/build
@@ -22,6 +14,9 @@ modules/*/*.mod.c
 modules/*/Module.symvers
 modules/*/modules.order
 modules/*/.tmp_versions/
+
+# Default Makefile output dir (rootfs dir and images)
+output
 
 # Generic
 *.bak

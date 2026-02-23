@@ -3,17 +3,18 @@ $(warning "Your environment is not set!)
 $(error "Please source 'scripts/setup_env.sh'")
 endif
 
-INSTALL_MOD_PATH ?= "${TOP_DIR}/rootfs_staging"
-INSTALL_MOD_DIR  = "test"
+DESTDIR ?= "$(TOP_DIR)/rootfs_staging"
+INSTALL_MOD_DIR  ?= test
 
 obj-m += hello-kernel.o
 
+.PHONY: build install clean
 
-all:
-	$(MAKE) -C ${KERNEL_DIR} M=$(PWD) modules
+build:
+	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) modules
 
 install:
-	$(MAKE) -C ${KERNEL_DIR} M=$(PWD) INSTALL_MOD_PATH=${INSTALL_MOD_PATH} INSTALL_MOD_DIR=${INSTALL_MOD_DIR} modules_install
+	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) INSTALL_MOD_PATH=$(DESTDIR) INSTALL_MOD_DIR=$(INSTALL_MOD_DIR) modules_install
 
 clean:
-	$(MAKE) -C ${KERNEL_DIR} M=$(PWD) clean
+	$(MAKE) -C $(KERNEL_DIR) M=$(CURDIR) clean

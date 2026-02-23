@@ -8,7 +8,7 @@ ROOTFS_DIR="${TOP_DIR}/rootfs_staging-$(date +%Y%2m%2d-%H%M%S)"
 add_all_modules() {
     for module in ${TOP_DIR}/modules/*; do
         if [ -d "${module}" ]; then
-            make -C ${module} INSTALL_MOD_PATH="${ROOTFS_DIR}" install
+            make -C ${module} DESTDIR="${ROOTFS_DIR}" install
         fi
     done
 }

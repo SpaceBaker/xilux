@@ -5,101 +5,83 @@
     #address-cells = <1>;
 
     images {
-        kernel-dev {
+        kernel-0 {
             description = "Xilux development kernel";
-            data = /incbin/("./uImage-dev.gz");
+            data = /incbin/("./Image.gz");
             type = "kernel";
             arch = "arm";
             os = "linux";
             compression = "gzip";
-            load = <0x2000000>;
-            entry = <0x2000000>;
+            load = <0x00008000>;
+            entry = <0x00008000>;
+            hash-1 {
+                algo = "sha256";
+            };
         };
-
-        kernel-rel {
-            description = "Xilux release kernel";
-            data = /incbin/("./uImage-rel.gz");
-            type = "kernel";
-            arch = "arm";
-            os = "linux";
-            compression = "gzip";
-            load = <0x2000000>;
-            entry = <0x2000000>;
-        };
-
+        
         initramfs {
             description = "Xilux initramfs";
-            data = /incbin/("./uinitramfs.cpio.lzma");
+            data = /incbin/("./initramfs.cpio.gz");
             type = "ramdisk";
             arch = "arm";
             os = "linux";
-            compression = "none";
-            load = <0x3100000>;
-            entry = <0x3100000>;
+            hash-1 {
+                algo = "sha256";
+            };
         };
 
         fdt-zc706 {
             description = "Xilux ZC706 board fdt";
-            data = /incbin/("./xilux-zc706.dtb");
+            data = /incbin/("./zynq-zc706.dtb");
             type = "flat_dt";
             arch = "arm";
-            compression = "none";
-            load = <0x1f00000>;
+            hash-1 {
+                algo = "sha256";
+            };
         };
 
         fdt-zc702 {
             description = "Xilux ZC702 board fdt";
-            data = /incbin/("./xilux-zc702.dtb");
+            data = /incbin/("./zynq-zc702.dtb");
             type = "flat_dt";
             arch = "arm";
-            compression = "none";
-            load = <0x1f00000>;
+            hash-1 {
+                algo = "sha256";
+            };
         };
     };
 
     configurations {
-        default = "config-1";
+        default = "config-0";
 
         config-0 {
-            description = "ZC706 development configuration";
-            kernel = "kernel-dev";
-            ramdisk = "initramfs";
+            description = "ZC706 default configuration";
+            compatible = "xilux,zc706";
+            kernel = "kernel-0";
             fdt = "fdt-zc706";
         };
 
         config-1 {
-            description = "ZC706 release configuration";
-            kernel = "kernel-rel";
-            ramdisk = "initramfs";
+            description = "ZC706 initramfs configuration";
+            compatible = "xilux,zc706";
+            kernel = "kernel-0";
             fdt = "fdt-zc706";
+            ramdisk = "initramfs";
         };
 
         config-2 {
-            description = "ZC706 initramfs configuration";
-            kernel = "kernel-dev";
-            ramdisk = "initramfs";
-            fdt = "fdt-zc706";
+            description = "ZC702 default configuration";
+            compatible = "xilux,zc702";
+            kernel = "kernel-0";
+            fdt = "fdt-zc702";
         };
 
         config-3 {
-            description = "ZC702 development configuration";
-            kernel = "kernel-dev";
-            ramdisk = "initramfs";
-            fdt = "fdt-zc702";
-        };
-
-        config-4 {
-            description = "ZC702 release configuration";
-            kernel = "kernel-rel";
-            ramdisk = "initramfs";
-            fdt = "fdt-zc702";
-        };
-
-        config-5 {
             description = "ZC702 initramfs configuration";
-            kernel = "kernel-dev";
-            ramdisk = "initramfs";
+            compatible = "xilux,zc702";
+            kernel = "kernel-0";
             fdt = "fdt-zc702";
+            ramdisk = "initramfs";
         };
     };
 };

@@ -3,8 +3,8 @@
 set -e
 
 ROOTFS="rootfs_staging"
-TYPE="none"
-OUTPUT="initramfs"
+COMPRESSION="none"
+OUTPUT="../initramfs"
 compTypes=("bzip2" "gzip" "lz4" "lzma" "lzo" "none" "xc" "zstd")
 
 # Check args
@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
 			shift # past value
 			;;
 		-c|--compression-type)
-			TYPE="$2"
+			COMPRESSION="$2"
 			if [ -z "$2" ]; then
 				echo "compression-type cannot be empty"
 				exit 1
@@ -59,46 +59,47 @@ set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 cd ${ROOTFS}
 
-case "${TYPE}" in
+case "${COMPRESSION}" in
 	"bzip2")
 		OUTPUT="${OUTPUT}.cpio.bz2"
-		find . -print0 | cpio --null --create --format=newc | bzip2 -z --best > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | bzip2 -z --best > "${OUTPUT}"
 		;;
 	"gzip")
 		OUTPUT="${OUTPUT}.cpio.gz"
-		find . -print0 | cpio --null --create --format=newc | gzip --best > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | gzip --best > "${OUTPUT}"
 		;;
 	"lz4")
 		OUTPUT="${OUTPUT}.cpio.lz4"
-		find . -print0 | cpio --null --create --format=newc | lz4 --best > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | lz4 --best > "${OUTPUT}"
 		;;
 	"lzma"|"xz")
-		TYPE="lzma"
+		COMPRESSION="lzma"
 		OUTPUT="${OUTPUT}.cpio.lzma"
-		# TOCHECK do we need the --format="lzma" flag ?
-		find . -print0 | cpio --null --create --format=newc | xz -z --format="lzma" --best > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | xz -z --format="lzma" --best > "${OUTPUT}"
 		;;
 	"lzo")
 		OUTPUT="${OUTPUT}.cpio.lzo"
-		find . -print0 | cpio --null --create --format=newc | lz0 --best > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | lz0 --best > "${OUTPUT}"
 		;;
 	"none")
 		OUTPUT="${OUTPUT}.cpio"
-		find . -print0 | cpio --null --create --format=newc > "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc > "${OUTPUT}"
 		;;
 	"zstd")
 		OUTPUT="${OUTPUT}.cpio.zst"
-		find . -print0 | cpio --null --create --format=newc | zstd -19 -o "../${OUTPUT}"
+		find . -print0 | cpio --null --create --format=newc | zstd -19 -o "${OUTPUT}"
 		;;
 	*)
-		echo "Invalid compression type ${TYPE}"
+		echo "Invalid compression type ${COMPRESSION}"
 		echo "Supported are: ${compTypes[*]}"
 		exit 1
 		;;
 esac
 
-cd ..
-mkimage -n "Ramdisk Image" -A arm -O linux -T ramdisk -C "${TYPE}" -d "${OUTPUT}" "u${OUTPUT}"
-echo "done."
+# cd ..
+# mkimage -n "Ramdisk Image" -A arm -O linux -T ramdisk -C "${COMPRESSION}" -d "${OUTPUT}" "u${OUTPUT}"
+# mkdir -p images
+# mv "${OUTPUT}" "u${OUTPUT}" images/
+# echo "done."
 
 exit 0
