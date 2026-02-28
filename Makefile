@@ -1,35 +1,43 @@
-ifndef KERNEL_DIR
+include env.mk
+export
+
+ifndef XILUX_ENV
 $(warning "Your environment is not set!")
-$(error "Please source 'scripts/setup_env.sh'")
+$(error "Please include a valid 'env.mk' file")
 endif
 
-TOP_DIR					:= $(CURDIR)
 override DATETIME		:= $(shell date +%Y%2m%2d-%H%M%S)
-APPS_SUBDIRS 			:= $(patsubst %/,%,$(dir $(wildcard apps/*/Makefile)))
-APPS_BUILD		  		 = $(addsuffix .build,$(APPS_SUBDIRS))
-APPS_INSTALL	  		 = $(addsuffix .install,$(APPS_SUBDIRS))
-APPS_CLEAN		 		 = $(addsuffix .clean,$(APPS_SUBDIRS))
-MODULES_SUBDIRS 		:= $(patsubst %/,%,$(dir $(wildcard modules/*/Makefile)))
-MODULES_BUILD		 	 = $(addsuffix .build,$(MODULES_SUBDIRS))
-MODULES_INSTALL	 		 = $(addsuffix .install,$(MODULES_SUBDIRS))
-MODULES_CLEAN		 	 = $(addsuffix .clean,$(MODULES_SUBDIRS))
+# Project directories
+TOP_DIR    				:= $(CURDIR)
+SCRIPT_DIR 				:= $(TOP_DIR)/scripts
+KERNEL_DIR				:= $(TOP_DIR)/kernel
+SRC_DIR    				:= $(TOP_DIR)/sources
 BOOTGEN_DIR				:= $(TOP_DIR)/bootgen
 UBOOT_DIR				:= $(TOP_DIR)/u-boot
+APPS_SUBDIRS 			:= $(patsubst %/,%,$(dir $(wildcard apps/*/Makefile)))
+MODULES_SUBDIRS 		:= $(patsubst %/,%,$(dir $(wildcard modules/*/Makefile)))
+# Output/work directories
 WORK_DIR				:= $(TOP_DIR)/output
 IMG_DIR					:= $(WORK_DIR)/images
 ROOTFS_STAGING_DIR		?= $(WORK_DIR)/rootfs_staging_$(DATETIME)
 ROOTFS_BASENAME			:= $(notdir $(subst _staging,,$(ROOTFS_STAGING_DIR)))
+# Indirect recipe lists
+APPS_BUILD		  		 = $(addsuffix .build,$(APPS_SUBDIRS))
+APPS_INSTALL	  		 = $(addsuffix .install,$(APPS_SUBDIRS))
+APPS_CLEAN		 		 = $(addsuffix .clean,$(APPS_SUBDIRS))
+MODULES_BUILD		 	 = $(addsuffix .build,$(MODULES_SUBDIRS))
+MODULES_INSTALL	 		 = $(addsuffix .install,$(MODULES_SUBDIRS))
+MODULES_CLEAN		 	 = $(addsuffix .clean,$(MODULES_SUBDIRS))
+# Misc
 VENDOR					?= xilinx
 KERNELRELEASE 			 = $(shell make -sC $(KERNEL_DIR) kernelrelease)
+PATH					:= $(PATH):$(SCRIPT_DIR)
 
 # Disable parallelism just to correctly display prints
 .NOTPARALLEL:
 
 # Main recipes ########################################################
-.PHONY: build rootfs image clean clean_all clean_workdir info test
-
-test:
-	@echo $($(MAKE) -C $(KERNEL_DIR) kernelrelease)
+.PHONY: build rootfs image clean clean_all clean_workdir info
 
 build: 	fsbl u-boot kernel kernel_modules modules apps
 
@@ -47,22 +55,7 @@ clean_workdir:
 	rm -rf $(WORK_DIR)
 
 info:
-	@printf "TOP_DIR\033[20G= $(TOP_DIR)\n"
-	@printf "DATETIME\033[20G= $(DATETIME)\n"
-	@printf "APPS_SUBDIRS\033[20G= $(APPS_SUBDIRS)\n"
-	@printf "APPS_BUILD\033[20G= $(APPS_BUILD)\n"
-	@printf "APPS_INSTALL\033[20G= $(APPS_INSTALL)\n"
-	@printf "APPS_CLEAN\033[20G= $(APPS_CLEAN)\n"
-	@printf "MODULES_SUBDIRS\033[20G= $(MODULES_SUBDIRS)\n"
-	@printf "MODULES_BUILD\033[20G= $(MODULES_BUILD)\n"
-	@printf "MODULES_INSTALL\033[20G= $(MODULES_INSTALL)\n"
-	@printf "MODULES_CLEAN\033[20G= $(MODULES_CLEAN)\n"
-	@printf "BOOTGEN_DIR\033[20G= $(BOOTGEN_DIR)\n"
-	@printf "UBOOT_DIR\033[20G= $(UBOOT_DIR)\n"
-	@printf "WORK_DIR\033[20G= $(WORK_DIR)\n"
-	@printf "IMG_DIR\033[20G= $(IMG_DIR)\n"
-	@printf "ROOTFS_STAGING_DIR\033[20G= $(ROOTFS_STAGING_DIR)\n"
-	@printf "ROOTFS_BASENAME\033[20G= $(ROOTFS_BASENAME)\n"
+	@(env -0 | sort -z | tr '\0' '\n')
 
 
 # Xilux apps recipes ##################################################
@@ -235,7 +228,7 @@ clean_image:
 
 %.build:
 	@boxed_echo.sh "Building '$*'" green
-	$(MAKE) -C $*
+	$(MAKE) -C $* build
 
 %.install:
 	@boxed_echo.sh "Installing '$*' into $(ROOTFS_STAGING_DIR)" green

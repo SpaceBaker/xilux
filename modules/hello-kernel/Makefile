@@ -1,9 +1,9 @@
 ifndef KERNEL_DIR
-$(warning "Your environment is not set!)
-$(error "Please source 'scripts/setup_env.sh'")
+$(warning "No kernel directory set")
+$(error "Please provide a path to your kernel source code (defined in top-level Makefile)")
 endif
 
-DESTDIR ?= "$(TOP_DIR)/rootfs_staging"
+DESTDIR ?= $(CURDIR)/_install
 INSTALL_MOD_DIR  ?= test
 
 obj-m += hello-kernel.o
