@@ -1,13 +1,14 @@
+ifndef KERNEL_DIR
+$(warning "No kernel directory set")
+$(error "Please provide a path to your kernel source code (defined in top-level Makefile)")
+endif
+
 DTC ?= dtc
 CPP ?= cpp
 DTS_FILES := $(shell find $(CURDIR) -name '*.dts')
 DTB_FILES := $(DTS_FILES:.dts=.dtb)
 
-CPPFLAGS := -nostdinc -Iinclude -undef -D__DTS__ -x assembler-with-cpp
-
-test:
-	@echo "DTS_FILES=$(DTS_FILES)"
-	@echo "DTB_FILES=$(DTB_FILES)"
+CPPFLAGS := -nostdinc -Iinclude -I$(KERNEL_DIR)/include -undef -D__DTS__ -x assembler-with-cpp
 
 # Target
 all: $(DTB_FILES)
@@ -18,11 +19,11 @@ all: $(DTB_FILES)
 	rm -rf *.tmp
 
 # Generate temporal file using the C preprocessor
-%.dts.tmp:
+%.dts.tmp: %.dts
 	$(CPP) -Wp,-MD,$*.dep.tmp $(CPPFLAGS) -o $@ $*.dts
 
 # Clean dtb
 clean:
 	rm -rf *.dtb
 
-.PHONY: all clean clean_tmp test
+.PHONY: all clean

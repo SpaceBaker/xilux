@@ -90,6 +90,7 @@ APPS_DIR 				:= $(TOP_DIR)/apps
 MODULES_DIR 			:= $(TOP_DIR)/modules
 PKGS_DIR 				:= $(TOP_DIR)/packages
 SCRIPT_DIR 				:= $(TOP_DIR)/scripts
+DT_DIR					:= $(TOP_DIR)/devicetree
 # Targets
 APPS					:= hello-userspace
 MODULES					:= hello-kernel
@@ -115,7 +116,8 @@ VENDOR					?= xilinx
 KERNELRELEASE 			 = $(shell make -sC $(KERNEL_DIR) kernelrelease)
 PATH					:= $(PATH):$(TOOLS_DIR)
 
-# Disable parallelism just to correctly display prints
+# IMPORTANT: THIS MAKEFILE DOES NOT WORK WITH PARALLEL JOBS !!!
+# Need a major overhaul if (top-level) parallelism is needed
 .NOTPARALLEL:
 
 # Main recipes ########################################################
@@ -128,12 +130,10 @@ rootfs:	build rootfs_prepare rootfs_install rootfs_compress
 image: 	rootfs image_prepare image_add_kernel image_add_rootfs \
 		image_add_initramfs image_add_bootbin image_add_fit
 
-clean: clean_workdir
+clean_all:  clean_pkgs clean_apps clean_modules clean_kernel \
+			clean_u-boot clean_dtbs clean
 
-clean_all:  clean_pkgs clean_apps clean_modules \
-			clean_kernel clean_u-boot clean_workdir
-
-clean_workdir:
+clean:
 	rm -rf $(WORK_DIR)
 
 info:
@@ -179,10 +179,6 @@ $(KERNEL_DIR)/arch/$(ARCH)/boot/Image:
 	@boxed_echo.sh "Building 'kernel image'" green
 	$(MAKE) -C $(KERNEL_DIR) Image
 
-## TODO: own device tree
-$(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(VENDOR)/%.dtb: $(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(VENDOR)/%.dts
-	$(MAKE) -C $(KERNEL_DIR) dtbs
-
 kernel_modules:
 	@boxed_echo.sh "Building 'kernel modules'" green
 	$(MAKE) -C $(KERNEL_DIR) modules
@@ -200,10 +196,18 @@ clean_kernel: $(KERNEL_DIR).clean
 u-boot: $(UBOOT_DIR)/u-boot.elf
 
 $(UBOOT_DIR)/u-boot.elf: $(UBOOT_DIR)/.config
-	@boxed_echo.sh "Building '$*'" green
+	@boxed_echo.sh "Building 'u-boot'" green
 	$(MAKE) -C u-boot u-boot.elf
 
 clean_u-boot: $(UBOOT_DIR).clean
+
+
+# device tree recipes #################################################
+.PHONY: dtbs clean_dtbs
+
+dtbs: $(DT_DIR).build
+
+clean_dtbs: $(DT_DIR).clean
 
 
 # fsbl recipes ########################################################
@@ -281,7 +285,7 @@ clean_initramfs:
 # image recipes #######################################################
 .PHONY: image_prepare image_prepare_msg image_bootbin image_fit clean_image
 
-image_prepare: image_prepare_msg clean_image $(IMG_DIR)
+image_prepare: clean_image image_prepare_msg $(IMG_DIR)
 
 image_prepare_msg:
 	@boxed_echo.sh "Preparing images" green
@@ -301,14 +305,14 @@ image_add_initramfs: initramfs
 image_add_bootbin: $(IMG_DIR)/boot.bin
 
 $(IMG_DIR)/boot.bin: $(BOOTGEN_DIR)/uboot.bif u-boot fsbl
+	@boxed_echo.sh "Creating boot bin image" green
 	bootgen -arch zynq -image $< -w -o $@
 
 image_add_fit: $(IMG_DIR)/xilux.itb
 
-## TODO: own device tree
-$(IMG_DIR)/xilux.itb: $(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(VENDOR)/zynq-zc706.dtb $(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(VENDOR)/zynq-zc702.dtb devicetree/xilux.its
-	cp $(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(VENDOR)/zynq-zc706.dtb $(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(VENDOR)/zynq-zc702.dtb $(IMG_DIR)
-	cp devicetree/xilux.its $(IMG_DIR)
+$(IMG_DIR)/xilux.itb: dtbs $(DT_DIR)/xilux.its
+	cp $(wildcard $(DT_DIR)/*.dtb) $(IMG_DIR)
+	cp $(DT_DIR)/xilux.its $(IMG_DIR)
 	mkimage -q -f $(IMG_DIR)/xilux.its $@
 	@rm $(IMG_DIR)/xilux.its
 

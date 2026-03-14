@@ -32,7 +32,7 @@
 
         fdt-zc706 {
             description = "Xilux ZC706 board fdt";
-            data = /incbin/("./zynq-zc706.dtb");
+            data = /incbin/("./xilux-zc706.dtb");
             type = "flat_dt";
             arch = "arm";
             hash-1 {
@@ -42,7 +42,7 @@
 
         fdt-zc702 {
             description = "Xilux ZC702 board fdt";
-            data = /incbin/("./zynq-zc702.dtb");
+            data = /incbin/("./xilux-zc702.dtb");
             type = "flat_dt";
             arch = "arm";
             hash-1 {

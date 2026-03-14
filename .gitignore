@@ -3,7 +3,7 @@ packages/**
 !packages/*.json
 
 # Binaries and objects generated from userspace applications build
-apps/*/build
+apps/*/build/
 
 # Binaries and objects generated from kernel module build
 modules/*/*.o
@@ -15,8 +15,12 @@ modules/*/Module.symvers
 modules/*/modules.order
 modules/*/.tmp_versions/
 
+# Device tree blob
+*.dtb
+*.itb
+
 # Default Makefile output dir (rootfs dir and images)
-output
+output/
 
 # Generic
 *.bak
