@@ -9,3 +9,6 @@ else
   # non root
   export PS1='\n\e[92m\e[1m\u@\h\e[0m \e[94m\w \e[92m\e[1m$\e[0m\e[0m\e[39m\e[49m '
 fi
+
+# Set the terminal environment variables (LINES and COLUMNS) to the current window size
+resize > /dev/null
