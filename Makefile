@@ -252,6 +252,7 @@ rootfs_install_scripts: $(ROOTFS_STAGING_DIR)-populated.chkdir
 	@for SCR in $(SCRIPTS); do \
 		cd $(SCRIPT_DIR); \
 		if [ -d $$SCR ]; then cd $$SCR; fi; \
+		find . -type d -exec install -Dm 755 "{}" -d "$(ROOTFS_STAGING_DIR)-populated/{}" \;; \
 		find . -type f -exec install -Dm 755 "{}" "$(ROOTFS_STAGING_DIR)-populated/{}" \;; \
 	done
 

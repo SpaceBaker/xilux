@@ -24,12 +24,21 @@ echo /sbin/mdev > /proc/sys/kernel/hotplug
 # which would then be handled by mdev itself when it is fork+exec'd by the kernel
 /sbin/mdev -s
 
+######################################
+# Add network state file to /var/run #
+######################################
+ln -s /run /var/run
+mkdir -p /run/network
+touch /run/network/ifstate
+
 #################################################
 # Setup the loopback network device (localhost) #
 #################################################
-ip link add lo type dummy
-ip addr add 127.0.0.1/32 dev lo
-ip link set lo up
+# Commented out since it is configured in /etc/network/interfaces and 
+#   set up in init.d/S??_network service script
+# ip link add lo type dummy
+# ip addr add 127.0.0.1/32 dev lo
+# ip link set lo up
 
 ##############################################################
 # Start all init scripts fomr /etc/init.d in numerical order #

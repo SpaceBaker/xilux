@@ -21,5 +21,6 @@
 
 # Stuff to do before rebooting
 ::ctrlaltdel:/sbin/reboot
+::shutdown:/sbin/ifdown -a
 ::shutdown:/bin/umount -a -r
 # ::shutdown:/sbin/swapoff -a
