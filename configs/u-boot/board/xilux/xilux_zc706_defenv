@@ -1,0 +1,8 @@
+bootdelay=3
+baudrate=115200
+loadaddr=0x05000000
+ipaddr=192.168.86.42
+serverip=192.168.86.20
+bootargs=console=ttyPS0,115200n8 earlycon root=/dev/mmcblk0p2 rootfstype=ext4 ro rootwait rw
+bootcmd=run mmcboot
+mmcboot=fatload mmc 0:1 ${loadaddr} xilux.itb; bootm
