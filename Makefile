@@ -114,6 +114,8 @@ PKGS_CLEAN		 	 	 = $(addsuffix .clean,$(PKGS_DIR)/$(PKGS))
 # Misc
 VENDOR					?= xilinx
 KERNELRELEASE 			 = $(shell make -sC $(KERNEL_DIR) kernelrelease)
+KERNEL_DEFCONFIG		?= xilux_zc706_defconfig
+UBOOT_DEFCONFIG			?= xilux_zc706_defconfig
 PATH					:= $(PATH):$(TOOLS_DIR)
 
 # IMPORTANT: THIS MAKEFILE DOES NOT WORK WITH PARALLEL JOBS !!!
@@ -175,9 +177,12 @@ clean_modules: $(MODULES_CLEAN)
 
 kernel: $(KERNEL_DIR)/arch/$(ARCH)/boot/Image
 
-$(KERNEL_DIR)/arch/$(ARCH)/boot/Image:
+$(KERNEL_DIR)/arch/$(ARCH)/boot/Image: $(KERNEL_DIR)/.config
 	@boxed_echo.sh "Building 'kernel image'" green
 	$(MAKE) -C $(KERNEL_DIR) Image
+
+$(KERNEL_DIR)/.config: $(KERNEL_DIR)/arch/$(ARCH)/configs/$(KERNEL_DEFCONFIG)
+	$(MAKE) -C $(KERNEL_DIR) $(KERNEL_DEFCONFIG)
 
 kernel_modules:
 	@boxed_echo.sh "Building 'kernel modules'" green
@@ -197,7 +202,10 @@ u-boot: $(UBOOT_DIR)/u-boot.elf
 
 $(UBOOT_DIR)/u-boot.elf: $(UBOOT_DIR)/.config
 	@boxed_echo.sh "Building 'u-boot'" green
-	$(MAKE) -C u-boot u-boot.elf
+	$(MAKE) -C $(UBOOT_DIR) u-boot.elf
+
+$(UBOOT_DIR)/.config: $(UBOOT_DIR)/configs/$(UBOOT_DEFCONFIG)
+	$(MAKE) -C $(UBOOT_DIR) $(UBOOT_DEFCONFIG)
 
 clean_u-boot: $(UBOOT_DIR).clean
 
