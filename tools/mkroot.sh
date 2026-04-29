@@ -54,9 +54,4 @@ else
 	exit 1
 fi
 
-# Remove PLACEHOLDER file if it exists (from git)
-if [ -e "${ROOT}/PLACEHOLDER" ]; then
-	rm -v "${ROOT}"/PLACEHOLDER
-fi
-
 echo "Done."

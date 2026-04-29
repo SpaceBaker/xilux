@@ -4,9 +4,10 @@
 #################################################################################
 
 TARGET_EXEC := $(notdir $(CURDIR))
-
-BUILD_DIR := build
-SRC_DIRS := src
+BUILD_DIR   := build
+SRC_DIRS    := src
+DESTDIR		?= _install
+PREFIX		?= usr/local/bin
 
 # Find all the C and C++ files we want to compile
 # Note the single quotes around the * expressions. The shell will incorrectly expand these otherwise, but we want to send the * directly to the find command.
@@ -28,22 +29,12 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
 CPPFLAGS := $(CPPFLAGS) $(INC_FLAGS) -MMD -MP
+CFLAGS   := $(CFLAGS) -fPIC
+LDFLAGS  := $(LDFLAGS) -pie -s
 
-CFLAGS := $(CFLAGS) -fPIC
 
-LDFLAGS := $(LDFLAGS) -pie -s
-
-.PHONY: all info
-all: $(BUILD_DIR)/$(TARGET_EXEC)
-	@echo $(TARGET_EXEC) done.
-
-info:
-	@echo CC:$(CC)
-	@echo CXX:$(CXX)
-	@echo cppflags:$(CPPFLAGS)
-	@echo cflags:$(CFLAGS)
-	@echo c++flags:$(CXXFLAGS)
-	@echo ldflags:$(LDFLAGS)
+.PHONY: build
+build: $(BUILD_DIR)/$(TARGET_EXEC)
 
 # The final build step.
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
@@ -60,9 +51,25 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
+.PHONY: install
+install: build
+	install -v -D -m751 $(BUILD_DIR)/$(TARGET_EXEC) $(DESTDIR)/$(PREFIX)/$(TARGET_EXEC)
+
+
 .PHONY: clean
 clean:
-	@rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)
+
+
+.PHONY: info
+info:
+	@echo CC:$(CC)
+	@echo CXX:$(CXX)
+	@echo cppflags:$(CPPFLAGS)
+	@echo cflags:$(CFLAGS)
+	@echo c++flags:$(CXXFLAGS)
+	@echo ldflags:$(LDFLAGS)
+
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those

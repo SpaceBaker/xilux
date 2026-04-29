@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Print out a welcome banner and time taken for the boot process
+# clear
+if [ -f /etc/banner.txt ]; then
+    cat /etc/banner.txt
+fi
+
+echo "Booting took $(cut -d' ' -f1 /proc/uptime)s"

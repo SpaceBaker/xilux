@@ -1,0 +1,87 @@
+/dts-v1/;
+
+/ {
+    description = "Xilux various kernels, ramdisks and FDT blobs";
+    #address-cells = <1>;
+
+    images {
+        kernel-0 {
+            description = "Xilux development kernel";
+            data = /incbin/("./Image.gz");
+            type = "kernel";
+            arch = "arm";
+            os = "linux";
+            compression = "gzip";
+            load = <0x00008000>;
+            entry = <0x00008000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+        
+        initramfs {
+            description = "Xilux initramfs";
+            data = /incbin/("./initramfs.cpio.gz");
+            type = "ramdisk";
+            arch = "arm";
+            os = "linux";
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt-zc706 {
+            description = "Xilux ZC706 board fdt";
+            data = /incbin/("./xilux-zc706.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt-zc702 {
+            description = "Xilux ZC702 board fdt";
+            data = /incbin/("./xilux-zc702.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+    };
+
+    configurations {
+        default = "config-0";
+
+        config-0 {
+            description = "ZC706 default configuration";
+            compatible = "xilux,zc706";
+            kernel = "kernel-0";
+            fdt = "fdt-zc706";
+        };
+
+        config-1 {
+            description = "ZC706 initramfs configuration";
+            compatible = "xilux,zc706";
+            kernel = "kernel-0";
+            fdt = "fdt-zc706";
+            ramdisk = "initramfs";
+        };
+
+        config-2 {
+            description = "ZC702 default configuration";
+            compatible = "xilux,zc702";
+            kernel = "kernel-0";
+            fdt = "fdt-zc702";
+        };
+
+        config-3 {
+            description = "ZC702 initramfs configuration";
+            compatible = "xilux,zc702";
+            kernel = "kernel-0";
+            fdt = "fdt-zc702";
+            ramdisk = "initramfs";
+        };
+    };
+};
