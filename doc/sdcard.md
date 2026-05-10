@@ -123,20 +123,29 @@ mkfs.vfat -F 32 -n boot /dev/sdX1
 mkfs.ext4 -L root /dev/sdX2
 ```
 
-9. Mount the boot partition
+9. Mount the boot and root partition
 
 ```sh
-mkdir -p /mnt/boot
+mkdir -p /mnt/{boot,root}
 mount /dev/sdX1 /mnt/boot
+mount /dev/sdX2 /mnt/root
 ```
 
 10. Copy the boot.bin, the kernel image and whatever else you need for U-BOOT into the SD card, e.g.
 
-`cp boot.bin /mnt/boot/`
+`cp boot.bin image.itb /mnt/boot/`
 
-11. Unmount the SD card
+11. Extract the compressed rootfs into the SD card
 
-`umount /mnt/boot`
+`tar --no-same-owner -xzf rootfs.tar.gz -C /mnt/root/`
+
+12. Unmount the partitions
+
+`umount umount /dev/sdX?*`
+
+12. Eject the SD card
+
+`eject /dev/sdX`
 
 ## Testing
 
