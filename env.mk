@@ -32,25 +32,6 @@
 # License:    GPLv2
 ###############################################################################
 
-# Toolchain
-TARGET                 := arm-xilux-linux-gnueabihf
-ARCH                   := arm
-CROSS_COMPILER_PATH    := /opt/x-tools/$(TARGET)
-CROSS_COMPILER_SYSROOT := $(CROSS_COMPILER_PATH)/$(TARGET)/sysroot
-CHOST                  := $(TARGET)
-CROSS_COMPILE          := $(TARGET)-
-
-## Binutils
-CC      := $(TARGET)-gcc
-CXX     := $(TARGET)-g++
-CPP     := $(TARGET)-gcc -E
-AR      := $(TARGET)-ar
-AS      := $(TARGET)-as
-LD      := $(TARGET)-ld
-RANLIB  := $(TARGET)-ranlib
-READELF := $(TARGET)-readelf
-STRIP   := $(TARGET)-strip
-
 ## Make flags
 MAKEFLAGS := -j$(shell nproc) --no-print-directory
 
@@ -59,6 +40,7 @@ MAKEFLAGS := -j$(shell nproc) --no-print-directory
 
 ## C flags
 # CFLAGS := -I$(ROOTFS_DIR)/usr/include
+CFLAGS := -mcpu=cortex-a9
 
 ## C++ flags
 # CXXFLAGS := -I$(ROOTFS_DIR)/usr/include
@@ -66,9 +48,6 @@ MAKEFLAGS := -j$(shell nproc) --no-print-directory
 ## Linker flags
 # LDFLAGS         := -L$(ROOTFS_DIR)/lib -L$(ROOTFS_DIR)/usr/lib
 # LD_LIBRARY_PATH := $(ROOTFS_DIR)/usr/lib
-
-# Path
-PATH := $(shell echo $(CROSS_COMPILER_PATH)/bin:$$PATH)
 
 # Misc
 XILUX_ENV := 1
