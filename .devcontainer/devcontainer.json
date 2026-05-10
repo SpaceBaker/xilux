@@ -1,0 +1,53 @@
+{
+    "name": "ARM Linux (GCC v15.2)",
+
+    // Use 'build' instead of 'image' if you want to modify the base image
+    "image": "arm-none-linux-gnueabihf:latest",
+    // "build": {
+    //     "context": ".",
+    //     "dockerfile": "Dockerfile",
+    //     "args": {
+    //         "base_img": "arm-none-linux-gnueabihf:latest",
+    //         "devcontainercli": "true"
+    //     }
+    // },
+
+    "runArgs": [
+        "--hostname=XILUX-DEVCONTAINER"
+    ],
+
+    // which user to log in as inside the container
+    "remoteUser": "${localEnv:USER}", 
+    // syncs the UID/GID of 'vscode' to your host
+    "updateRemoteUserUID": false,
+
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils": {
+            "installZsh": "false",
+            "configureZshAsDefaultShell": "false",
+            "installOhMyZsh": "false",
+            "installOhMyZshConfig": "false"
+            // "username": "${localEnv:USER}",
+            // "userUid": "${localEnv:UID}",
+            // "userGid": "${localEnv:GROUPS}"
+        }
+    },
+
+    // Set container user
+    // "remoteUser": "${localEnv:USER}",
+    
+    // Set container working dir same as host 
+    "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=cached",
+    "workspaceFolder": "${localWorkspaceFolder}",
+
+    // Add useful extensions to the container
+    // "customizations": {
+    //     "vscode": {
+    //         "extensions": [
+    //             "ms-vscode.cpptools"
+    //         ]
+    //     }
+    // },
+
+    "onCreateCommand": "${localWorkspaceFolder}/.devcontainer/customize.sh"
+}
