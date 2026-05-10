@@ -252,24 +252,23 @@ rootfs_install_apps: $(ROOTFS_STAGING_DIR).chkdir $(APPS_INSTALL)
 rootfs_install_pkgs: $(ROOTFS_STAGING_DIR).chkdir $(PKGS_INSTALL)
 
 rootfs_install_libs: $(ROOTFS_STAGING_DIR).chkdir
-	@boxed_echo.sh "Adding libraries to $(ROOTFS_STAGING_DIR)-populated" green
-	$(CROSS_COMPILE)populate -v -s $(ROOTFS_STAGING_DIR) -d $(ROOTFS_STAGING_DIR)-populated
+	@boxed_echo.sh "Adding libraries to $(ROOTFS_STAGING_DIR)" green
+	@libpopulate.sh $(ROOTFS_STAGING_DIR)
 
-rootfs_install_scripts: $(ROOTFS_STAGING_DIR)-populated.chkdir
-	@boxed_echo.sh "Adding '$(SCRIPTS)' scripts to $(ROOTFS_STAGING_DIR)-populated" green
+rootfs_install_scripts: $(ROOTFS_STAGING_DIR).chkdir
+	@boxed_echo.sh "Adding '$(SCRIPTS)' scripts to $(ROOTFS_STAGING_DIR)" green
 	@for SCR in $(SCRIPTS); do \
 		cd $(SCRIPT_DIR); \
 		if [ -d $$SCR ]; then cd $$SCR; fi; \
-		find . -type d -exec install -Dm 755 "{}" -d "$(ROOTFS_STAGING_DIR)-populated/{}" \;; \
-		find . -type f -exec install -Dm 755 "{}" "$(ROOTFS_STAGING_DIR)-populated/{}" \;; \
+		find . -type d -exec install -Dm 755 "{}" -d "$(ROOTFS_STAGING_DIR)/{}" \;; \
+		find . -type f -exec install -Dm 755 "{}" "$(ROOTFS_STAGING_DIR)/{}" \;; \
 	done
 
 rootfs_compress: $(WORK_DIR)/$(ROOTFS_BASENAME).tar.gz
 
-# TO CHECK: is '-populated' necessary? crosstool-ng 'populate' tool cannot add libraries to the same dir it reads from...
-$(WORK_DIR)/$(ROOTFS_BASENAME).tar.gz: $(ROOTFS_STAGING_DIR)-populated.chkdir
-	@boxed_echo.sh "Compressing $(ROOTFS_STAGING_DIR)-populated" green
-	tar -czf $(WORK_DIR)/$(ROOTFS_BASENAME).tar.gz -C $(ROOTFS_STAGING_DIR)-populated .
+$(WORK_DIR)/$(ROOTFS_BASENAME).tar.gz: $(ROOTFS_STAGING_DIR).chkdir
+	@boxed_echo.sh "Compressing $(ROOTFS_STAGING_DIR)" green
+	tar --owner=0 --group=0 -czf $(WORK_DIR)/$(ROOTFS_BASENAME).tar.gz -C $(ROOTFS_STAGING_DIR) .
 
 clean_rootfs:
 	@boxed_echo.sh "Cleaning rootfs" green
@@ -282,9 +281,9 @@ clean_rootfs:
 
 initramfs: $(WORK_DIR)/initramfs.cpio.gz
 
-$(WORK_DIR)/initramfs.cpio.gz: $(ROOTFS_STAGING_DIR)-populated.chkdir
+$(WORK_DIR)/initramfs.cpio.gz: $(ROOTFS_STAGING_DIR).chkdir
 	@boxed_echo.sh "Creating initramfs" green
-	mkinitramfs.sh -r $(ROOTFS_STAGING_DIR)-populated -c gzip -o $(WORK_DIR)/initramfs
+	mkinitramfs.sh -r $(ROOTFS_STAGING_DIR) -c gzip -o $(WORK_DIR)/initramfs
 
 clean_initramfs:
 	@boxed_echo.sh "Cleaning initramfs" green
